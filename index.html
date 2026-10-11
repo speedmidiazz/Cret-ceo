@@ -1,0 +1,1000 @@
+<title>Atlas Paleo</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;900&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: caderno de campo de museu. Hero com modelo 3D vivo, catálogo em placas, detalhe em painel lateral. */
+:root{
+  --bg:#E8EBE6; --surface:#F5F7F3; --surface2:#DDE2DB; --ink:#16211C; --muted:#56635B; --line:#C5CDC3;
+  --accent:#0E5F57; --accent-ink:#F5F7F3; --hi:#D98E04;
+  --herb:#47811C; --carn:#BE3F27; --mar:#1A669B;
+  --ground:#C9D1C4; --stage1:#F4F7F1; --stage2:#D6DDD1;
+  --fd:'Big Shoulders Display','Arial Narrow',Impact,sans-serif;
+  --fb:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --fm:'IBM Plex Mono',ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0E1411; --surface:#151D18; --surface2:#1D2821; --ink:#E4E9E1; --muted:#93A097; --line:#2B3830;
+  --accent:#62CDBB; --accent-ink:#0E1411; --hi:#F0B03A;
+  --herb:#8CC85A; --carn:#EE7A5E; --mar:#5DB0E6;
+  --ground:#1E2A23; --stage1:#1B261F; --stage2:#0F1612; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0E1411; --surface:#151D18; --surface2:#1D2821; --ink:#E4E9E1; --muted:#93A097; --line:#2B3830;
+  --accent:#62CDBB; --accent-ink:#0E1411; --hi:#F0B03A;
+  --herb:#8CC85A; --carn:#EE7A5E; --mar:#5DB0E6;
+  --ground:#1E2A23; --stage1:#1B261F; --stage2:#0F1612; color-scheme:dark}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font:400 16px/1.55 var(--fb);padding-inline:clamp(16px,4vw,48px);padding-block:0}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{animation:none!important;transition:none!important}}
+a{color:inherit}
+button,select,input{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.wrap{max-width:1240px;margin-inline:auto}
+.mono{font-family:var(--fm);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+h1,h2,h3{font-family:var(--fd);font-weight:900;text-transform:uppercase;line-height:.95;margin:0;text-wrap:balance}
+h2{font-size:clamp(34px,5vw,56px)}
+h3{font-size:24px;line-height:1}
+
+/* topo */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bg);border-bottom:1px solid var(--line);margin-inline:calc(-1*clamp(16px,4vw,48px));padding:10px clamp(16px,4vw,48px)}
+.top .wrap{display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+.logo{font-family:var(--fd);font-weight:900;font-size:26px;letter-spacing:.04em;text-transform:uppercase;text-decoration:none;margin-right:auto}
+.logo span{color:var(--accent)}
+.top nav{display:flex;gap:18px;flex-wrap:wrap}
+.top nav a{font-family:var(--fm);font-size:12px;letter-spacing:.08em;text-transform:uppercase;text-decoration:none;color:var(--muted);padding:6px 0;border-bottom:2px solid transparent}
+.top nav a:hover{color:var(--ink);border-color:var(--accent)}
+.btn{background:var(--surface);border:1px solid var(--line);padding:8px 14px;cursor:pointer;font-family:var(--fm);font-size:12px;letter-spacing:.06em;text-transform:uppercase}
+.btn:hover{border-color:var(--ink)}
+.btn.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+
+/* hero */
+.hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:clamp(20px,4vw,56px);align-items:center;padding-block:clamp(28px,5vw,64px)}
+.hero h1{font-size:clamp(52px,9vw,124px);margin-block:10px 18px}
+.hero h1 em{font-style:normal;color:var(--accent)}
+.lead{font-size:18px;max-width:54ch;color:var(--muted);margin:0 0 22px}
+.cta{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:22px}
+.classes{display:flex;gap:18px;flex-wrap:wrap;font-family:var(--fm);font-size:13px}
+.classes button{background:none;border:0;border-bottom:1px solid var(--line);padding:2px 0;cursor:pointer;display:flex;gap:8px;align-items:center}
+.classes button:hover{border-color:var(--ink)}
+.sw{display:inline-block;width:10px;height:10px;background:currentColor}
+.c-h{color:var(--herb)} .c-c{color:var(--carn)} .c-m{color:var(--mar)}
+.note{margin-top:22px;padding:14px 16px;border:1px dashed var(--line);font-size:14px;color:var(--muted);max-width:60ch}
+.note b{color:var(--ink)}
+
+.stage{position:relative;background:radial-gradient(120% 100% at 50% 20%,var(--stage1),var(--stage2));border:1px solid var(--line);min-height:300px;overflow:hidden;touch-action:none}
+.stage canvas{display:block;width:100%;height:100%;cursor:grab}
+.stage canvas:active{cursor:grabbing}
+.hero .stage{height:clamp(320px,46vw,520px)}
+.stage .tag{position:absolute;left:12px;bottom:10px;pointer-events:none;max-width:70%}
+.stage .ctl{position:absolute;right:10px;top:10px;display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.stage .ctl .btn{padding:6px 10px}
+.stage .hint{position:absolute;right:12px;bottom:10px;pointer-events:none}
+.nogl{display:grid;place-items:center;height:100%;padding:24px;text-align:center;color:var(--muted)}
+
+/* seções */
+section{padding-block:clamp(36px,6vw,80px);border-top:1px solid var(--line)}
+.shead{display:flex;justify-content:space-between;align-items:end;gap:20px;flex-wrap:wrap;margin-bottom:24px}
+.shead p{margin:8px 0 0;color:var(--muted);max-width:60ch}
+
+/* filtros */
+.filters{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:22px}
+.filters .chips{display:flex;gap:6px;flex-wrap:wrap;margin-right:auto}
+.filters input[type=search],.filters select{background:var(--surface);border:1px solid var(--line);padding:8px 12px;min-width:0}
+.filters input[type=search]{width:min(260px,100%)}
+.count{font-family:var(--fm);font-size:12px;color:var(--muted);margin-bottom:12px}
+
+/* placas */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px}
+.card{background:var(--surface);border:1px solid var(--line);text-align:left;padding:0;cursor:pointer;display:flex;flex-direction:column;min-width:0}
+.card:hover{border-color:var(--ink)}
+.card .pic{position:relative;aspect-ratio:8/5;max-width:100%;background:radial-gradient(120% 100% at 50% 25%,var(--stage1),var(--stage2));border-bottom:1px solid var(--line)}
+.card .pic img{width:100%;height:100%;object-fit:contain;display:block}
+.card .pic .ph{position:absolute;inset:0;display:grid;place-items:center;font-family:var(--fd);font-size:44px;color:var(--line)}
+.card .no{position:absolute;left:10px;top:8px}
+.card .body{padding:12px 14px 14px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.card h3{overflow-wrap:anywhere}
+.card .sci{font-style:italic;color:var(--muted);font-size:14px;overflow-wrap:anywhere}
+.badge{display:inline-flex;align-items:center;gap:8px;font-family:var(--fm);font-size:11px;letter-spacing:.08em;text-transform:uppercase}
+.meta{display:flex;justify-content:space-between;gap:10px;font-family:var(--fm);font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.bar{height:4px;background:var(--surface2)}
+.bar i{display:block;height:100%;background:currentColor}
+.empty{padding:40px;border:1px dashed var(--line);color:var(--muted);text-align:center}
+
+/* anatomia, dietas, eras */
+.parts{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:0;border-top:1px solid var(--line);border-left:1px solid var(--line)}
+.parts div{padding:16px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);min-width:0}
+.parts h3{font-size:22px;margin-bottom:6px}
+.parts p{margin:0;color:var(--muted);font-size:14px}
+.parts .alt{font-family:var(--fm);font-size:11px;color:var(--accent);letter-spacing:.06em;text-transform:uppercase;display:block;margin-bottom:6px}
+.hips{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:20px}
+.hips div{background:var(--surface);border:1px solid var(--line);padding:16px}
+.hips h3{margin-bottom:6px}.hips p{margin:0;color:var(--muted);font-size:14px}
+.diet3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}
+.diet3 h3{margin-bottom:10px;display:flex;align-items:center;gap:10px}
+.rank{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px}
+.rank li{display:grid;grid-template-columns:minmax(0,1fr) 28px;gap:4px 10px;font-size:14px}
+.rank li span:first-child{overflow-wrap:anywhere}
+.rank li span:last-child{font-family:var(--fm);text-align:right;color:var(--muted)}
+.rank .bar{grid-column:1/-1}
+.eras{display:grid;grid-template-columns:51fr 56fr 79fr;gap:0;border:1px solid var(--line)}
+.era{padding:16px;border-right:1px solid var(--line);min-width:0;background:var(--surface)}
+.era:last-child{border-right:0}
+.era .span{font-family:var(--fm);font-size:12px;color:var(--muted);margin:4px 0 12px}
+.era h3{font-size:30px}
+.chipnames{display:flex;flex-wrap:wrap;gap:6px}
+.chipnames button{background:none;border:1px solid var(--line);padding:2px 8px;font-size:13px;cursor:pointer}
+.chipnames button:hover{border-color:var(--ink)}
+footer{border-top:1px solid var(--line);padding-block:28px 40px;color:var(--muted);font-size:14px;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+
+/* detalhe */
+.overlay{position:fixed;inset:0;z-index:50;background:color-mix(in srgb,var(--bg) 88%,transparent);overflow:auto;padding:clamp(8px,2vw,28px);backdrop-filter:blur(4px)}
+.panel{background:var(--bg);border:1px solid var(--ink);max-width:1240px;margin-inline:auto;display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);position:relative}
+.panel .left{border-right:1px solid var(--line);padding:0;min-width:0}
+.panel .left .stage{border:0;border-bottom:1px solid var(--line);height:clamp(320px,56vh,620px)}
+.panel .right{padding:clamp(16px,2.5vw,32px);min-width:0;display:flex;flex-direction:column;gap:22px}
+.close{position:absolute;right:10px;top:10px;z-index:3}
+.panel h2{font-size:clamp(40px,6vw,76px)}
+.panel .sci{font-style:italic;color:var(--muted);font-size:18px;margin-top:4px}
+.warn{border:1px solid var(--mar);padding:10px 12px;font-size:14px;background:color-mix(in srgb,var(--mar) 10%,transparent)}
+.facts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0;border-top:1px solid var(--line);border-left:1px solid var(--line)}
+.facts div{padding:10px 12px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);min-width:0}
+.facts b{display:block;font-weight:500;font-size:16px;overflow-wrap:anywhere}
+.right h4{font-family:var(--fm);font-weight:500;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 8px}
+.foods{display:flex;flex-wrap:wrap;gap:6px}
+.foods span{border:1px solid currentColor;padding:3px 10px;font-size:14px}
+.scale{display:flex;flex-direction:column;gap:6px;font-family:var(--fm);font-size:12px}
+.scale div{display:grid;grid-template-columns:110px minmax(0,1fr);gap:10px;align-items:center}
+.scale i{display:block;height:10px;background:var(--surface2);min-width:2px}
+.scale .me i{background:currentColor}
+.plist{display:flex;flex-direction:column;border-top:1px solid var(--line)}
+.plist button{background:none;border:0;border-bottom:1px solid var(--line);padding:10px 4px;text-align:left;cursor:pointer;display:grid;grid-template-columns:minmax(0,1fr);gap:2px}
+.plist button:hover{background:var(--surface)}
+.plist button[aria-pressed=true]{background:var(--surface);box-shadow:inset 3px 0 0 var(--hi)}
+.plist strong{font-weight:600}
+.plist small{color:var(--muted);font-size:13px;line-height:1.4}
+.plist button:not([aria-pressed=true]) small{display:none}
+.plist button:hover small{display:block}
+
+@media (max-width:900px){
+  .hero{grid-template-columns:minmax(0,1fr)}
+  .panel{grid-template-columns:minmax(0,1fr)}
+  .panel .left{border-right:0}
+  .diet3{grid-template-columns:minmax(0,1fr)}
+  .eras{grid-template-columns:minmax(0,1fr)}
+  .era{border-right:0;border-bottom:1px solid var(--line)}
+  .hips{grid-template-columns:minmax(0,1fr)}
+}
+</style>
+
+<header class="top"><div class="wrap">
+  <a class="logo" href="#topo">Atlas <span>Paleo</span></a>
+  <nav aria-label="Seções"><a href="#catalogo">Catálogo</a><a href="#anatomia">Anatomia</a><a href="#dietas">Dietas</a><a href="#eras">Eras</a></nav>
+  <button class="btn" id="themeBtn" type="button" aria-label="Alternar tema claro e escuro">Tema</button>
+</div></header>
+
+<main class="wrap" id="topo">
+<div class="hero">
+  <div>
+    <div class="mono" id="heroKicker">Catálogo de campo</div>
+    <h1>Dinossauros em 3D, <em>osso por osso</em></h1>
+    <p class="lead">Gire cada animal, troque entre o corpo e o esqueleto, toque em cada parte para ver o que ela fazia e descubra o que cada um comia. Herbívoros, carnívoros e répteis marinhos da Era dos Dinossauros.</p>
+    <div class="cta">
+      <a class="btn primary" href="#catalogo">Explorar o catálogo</a>
+      <button class="btn" id="randomBtn" type="button">Outro animal</button>
+    </div>
+    <div class="classes" id="classLinks"></div>
+    <p class="note"><b>Sobre o número 20 mil.</b> A ciência descreveu cerca de 1.500 espécies de dinossauros até hoje, então não existem 20 mil para catalogar. Este atlas começa com <span id="noteCount">62</span> animais com dados revisados, e o catálogo é uma lista que cresce sem mexer no resto da página.</p>
+  </div>
+  <div class="stage" id="heroStage">
+    <div class="ctl"><button class="btn on" data-mode="body" type="button">Corpo</button><button class="btn" data-mode="bone" type="button">Esqueleto</button></div>
+    <div class="tag mono" id="heroTag"></div>
+    <div class="hint mono">Arraste para girar</div>
+  </div>
+</div>
+
+<section id="catalogo">
+  <div class="shead"><div><div class="mono">Catálogo</div><h2>Todos os animais</h2><p>Filtre por classe, era ou busca. Clique numa placa para abrir o modelo 3D completo.</p></div></div>
+  <div class="filters">
+    <div class="chips" id="classChips"></div>
+    <select id="eraSel" aria-label="Era"><option value="">Todas as eras</option><option>Triássico</option><option>Jurássico</option><option>Cretáceo</option></select>
+    <select id="sortSel" aria-label="Ordenar"><option value="n">Nome A–Z</option><option value="L">Maiores primeiro</option><option value="old">Mais antigos primeiro</option></select>
+    <input type="search" id="q" placeholder="Buscar nome, comida ou país" aria-label="Buscar">
+  </div>
+  <div class="count" id="count"></div>
+  <div class="grid" id="grid"></div>
+</section>
+
+<section id="anatomia">
+  <div class="shead"><div><div class="mono">Anatomia</div><h2>Do osso ao animal</h2><p>Estas são as partes que você encontra no modelo 3D. No painel de cada animal, toque numa parte para destacá-la.</p></div></div>
+  <div class="parts" id="partsGrid"></div>
+  <div class="hips">
+    <div><h3>Saurísquios</h3><p>Quadril de lagarto: o púbis aponta para a frente. Reúnem os terópodes carnívoros, como o T. rex, e os saurópodes gigantes, como o Diplodocus.</p></div>
+    <div><h3>Ornitísquios</h3><p>Quadril de ave: o púbis aponta para trás. Reúnem Triceratops, Stegosaurus, Anquilossauros e os hadrossauros. As aves de hoje descendem dos terópodes, e não deste grupo.</p></div>
+  </div>
+</section>
+
+<section id="dietas">
+  <div class="shead"><div><div class="mono">Dietas</div><h2>O que cada classe comia</h2><p>Os itens que mais aparecem no cardápio dos animais deste atlas, em número de espécies.</p></div></div>
+  <div class="diet3" id="dietGrid"></div>
+</section>
+
+<section id="eras">
+  <div class="shead"><div><div class="mono">Eras</div><h2>Quando viveram</h2><p>Larguras proporcionais à duração de cada período, de 252 a 66 milhões de anos atrás. Répteis marinhos não são dinossauros, mas viveram nas mesmas eras.</p></div></div>
+  <div class="eras" id="eraGrid"></div>
+</section>
+
+<footer><span>Medidas e pesos são estimativas feitas a partir de fósseis, e variam entre estudos.</span><span>Feito por HarryDev</span></footer>
+</main>
+
+<div class="overlay" id="detail" role="dialog" aria-modal="true" aria-labelledby="dName" hidden>
+  <div class="panel">
+    <button class="btn close" id="closeBtn" type="button">Fechar</button>
+    <div class="left">
+      <div class="stage" id="detStage">
+        <div class="ctl"><button class="btn on" data-mode="body" type="button">Corpo</button><button class="btn" data-mode="bone" type="button">Esqueleto</button><button class="btn" id="spinBtn" type="button">Girar</button></div>
+        <div class="tag mono" id="detTag"></div>
+        <div class="hint mono">Arraste, role para zoom, toque numa parte</div>
+      </div>
+    </div>
+    <div class="right" id="detInfo"></div>
+  </div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+/* Catálogo: herbívoros. c = classe (h herbívoro, c carnívoro, m réptil marinho), p = plano corporal 3D */
+const DINOS = [
+{n:'Brachiosaurus',s:'Brachiosaurus altithorax',c:'h',p:'sauropod',per:'Jurássico Superior',ma:'154–153',L:22,W:'28–58 t',loc:'EUA (Colorado, Utah)',diet:['Samambaias','Cicadáceas','Folhas de coníferas e ginkgos nas copas altas'],teeth:'Dentes em forma de colher, bons para arrancar folhas.',f:'As patas dianteiras eram mais longas que as traseiras, o que erguia o pescoço bem alto.',k:{nang:0.35,neck:1.05}},
+{n:'Diplodocus',s:'Diplodocus longus',c:'h',p:'sauropod',per:'Jurássico Superior',ma:'154–152',L:26,W:'10–16 t',loc:'EUA (Colorado, Utah, Wyoming)',diet:['Samambaias','Cavalinhas','Folhas de coníferas'],teeth:'Dentes finos como lápis, só na frente da boca, usados como um pente.',f:'A cauda tinha mais de 70 vértebras e pode ter sido usada como chicote.',k:{nang:0.1,neck:1.15,tail:1.3}},
+{n:'Apatosaurus',s:'Apatosaurus ajax',c:'h',p:'sauropod',per:'Jurássico Superior',ma:'152–151',L:23,W:'16–22 t',loc:'EUA (Colorado, Utah, Wyoming)',diet:['Samambaias','Cavalinhas','Cicadáceas','Folhas de coníferas'],teeth:'Dentes em forma de lápis, na frente da boca.',f:'O pescoço era mais grosso e pesado que o do Diplodocus.',k:{nang:0.15,neck:0.95,bulk:1.15}},
+{n:'Argentinosaurus',s:'Argentinosaurus huinculensis',c:'h',p:'sauropod',per:'Cretáceo Superior',ma:'97–94',L:32,W:'65–80 t (estimativa)',loc:'Argentina (Neuquén)',diet:['Plantas baixas e arbustos','Coníferas','Samambaias'],teeth:'Dentes pequenos em forma de lápis.',f:'Um dos maiores animais terrestres já estimados, conhecido por poucos ossos, como vértebras com mais de 1 m de altura.',k:{nang:0.28,neck:0.9,bulk:1.25}},
+{n:'Patagotitan',s:'Patagotitan mayorum',c:'h',p:'sauropod',per:'Cretáceo Inferior',ma:'101–95',L:37,W:'50–57 t (estimativa)',loc:'Argentina (Chubut)',diet:['Coníferas','Samambaias','Plantas de copas médias'],teeth:'Dentes pequenos em forma de lápis.',f:'Foi reconstruído a partir de ossos de pelo menos seis indivíduos.',k:{nang:0.3,neck:0.95,bulk:1.2}},
+{n:'Camarasaurus',s:'Camarasaurus lentus',c:'h',p:'sauropod',per:'Jurássico Superior',ma:'155–145',L:17,W:'15–20 t',loc:'EUA (Colorado, Utah, Wyoming)',diet:['Coníferas','Ginkgos','Samambaias'],teeth:'Dentes grossos em forma de espátula.',f:'Um dos saurópodes mais comuns da América do Norte, com crânio curto e alto.',k:{nang:0.3,neck:0.6,bulk:1.1}},
+{n:'Mamenchisaurus',s:'Mamenchisaurus hochuanensis',c:'h',p:'sauropod',per:'Jurássico Superior',ma:'160–145',L:22,W:'~25 t',loc:'China (Sichuan)',diet:['Coníferas','Cicadáceas','Ginkgos'],teeth:'Dentes em forma de espátula, para arrancar folhas.',f:'O pescoço, com 19 vértebras, era um dos mais longos entre os dinossauros.',k:{nang:0.18,neck:1.7,tail:0.9}},
+{n:'Nigersaurus',s:'Nigersaurus taqueti',c:'h',p:'sauropod',per:'Cretáceo Inferior',ma:'115–105',L:9,W:'~4 t',loc:'Níger',diet:['Samambaias','Cavalinhas','Plantas rasteiras'],teeth:'Mais de 500 dentes finos numa boca larga e reta.',f:'Mantinha a cabeça apontada para baixo, como um aspirador de pó.',k:{nang:0.05,neck:0.45,tail:0.8,wide:1}},
+{n:'Saltasaurus',s:'Saltasaurus loricatus',c:'h',p:'sauropod',per:'Cretáceo Superior',ma:'70–66',L:8.5,W:'~7 t',loc:'Argentina (Salta)',diet:['Plantas baixas','Samambaias','Folhas'],teeth:'Dentes pequenos em forma de lápis.',f:'Foi um dos primeiros saurópodes achados com ossinhos de armadura na pele.',k:{nang:0.1,neck:0.5,tail:0.7,armor:1}},
+{n:'Maxakalisaurus',s:'Maxakalisaurus topai',c:'h',p:'sauropod',per:'Cretáceo Superior',ma:'80–70',L:13,W:'~9 t',loc:'Brasil (Minas Gerais)',diet:['Plantas baixas','Samambaias','Folhas de coníferas'],teeth:'Dentes pequenos em forma de lápis.',f:'Titanossauro encontrado em Minas Gerais e batizado em homenagem aos indígenas Maxakali.',k:{nang:0.2,neck:0.7,tail:0.9,bulk:1.05}},
+{n:'Uberabatitan',s:'Uberabatitan ribeiroi',c:'h',p:'sauropod',per:'Cretáceo Superior',ma:'70–66',L:26,W:'—',loc:'Brasil (Uberaba, MG)',diet:['Plantas baixas','Coníferas','Samambaias'],teeth:'Dentes pequenos em forma de lápis.',f:'Um dos maiores dinossauros do Brasil, achado em Uberaba, Minas Gerais.',k:{nang:0.25,neck:0.9,bulk:1.1}},
+{n:'Plateosaurus',s:'Plateosaurus engelhardti',c:'h',p:'ornitho',per:'Triássico Superior',ma:'214–204',L:9,W:'0,6–4 t (varia)',loc:'Alemanha, França, Suíça',diet:['Samambaias','Cavalinhas','Coníferas'],teeth:'Dentes em forma de folha, com bordas serrilhadas.',f:'Um dos primeiros dinossauros grandes; centenas de esqueletos foram achados na Europa.',k:{neck:1.6,tail:1.2,col:['#7b8c52','#bfae6a'],crest:0,beak:0}},
+{n:'Stegosaurus',s:'Stegosaurus stenops',c:'h',p:'thyreo',per:'Jurássico Superior',ma:'155–150',L:9,W:'3,5–5 t',loc:'EUA e Portugal',diet:['Samambaias','Cavalinhas','Cicadáceas','Musgos'],teeth:'Dentes pequenos em forma de folha e um bico córneo.',f:'Os 17 ossos em placa no dorso e os 4 espinhos da cauda (thagomizer) serviam de exibição e defesa.',k:{plates:1,spike:1,col:['#6a8a60','#d46c3c']}},
+{n:'Kentrosaurus',s:'Kentrosaurus aethiopicus',c:'h',p:'thyreo',per:'Jurássico Superior',ma:'155–150',L:4.5,W:'1–1,6 t',loc:'Tanzânia',diet:['Samambaias','Cicadáceas','Plantas rasteiras'],teeth:'Dentes pequenos em forma de folha e um bico córneo.',f:'Tinha placas no pescoço e espinhos longos nos quadris e na cauda.',k:{plates:0.6,spike:2,col:['#8a8a58','#d1a24a']}},
+{n:'Ankylosaurus',s:'Ankylosaurus magniventris',c:'h',p:'thyreo',per:'Cretáceo Superior',ma:'68–66',L:7,W:'4–8 t',loc:'EUA e Canadá',diet:['Plantas baixas','Samambaias','Arbustos'],teeth:'Dentes pequenos em forma de folha e um bico córneo.',f:'Tinha uma clava óssea na ponta da cauda e armadura de placas ósseas pelo corpo e pela cabeça.',k:{club:1,armor:1,col:['#7a6c55','#b89f72']}},
+{n:'Euoplocephalus',s:'Euoplocephalus tutus',c:'h',p:'thyreo',per:'Cretáceo Superior',ma:'76–74',L:5.5,W:'~2 t',loc:'Canadá (Alberta)',diet:['Plantas baixas','Samambaias'],teeth:'Dentes pequenos e um bico córneo.',f:'Até as pálpebras tinham placas ósseas que protegiam os olhos.',k:{club:1,armor:1,col:['#7a7c58','#c2a870']}},
+{n:'Triceratops',s:'Triceratops horridus',c:'h',p:'ceratops',per:'Cretáceo Superior',ma:'68–66',L:9,W:'6–12 t',loc:'EUA e Canadá',diet:['Cicadáceas','Palmeiras','Samambaias','Plantas rasteiras duras'],teeth:'Centenas de dentes cortantes em baterias, mais um bico de papagaio.',f:'O crânio chegava perto de 2 m, um dos maiores entre os animais terrestres.',k:{horn:'tri',col:['#7d8b5d','#c9a45f']}},
+{n:'Styracosaurus',s:'Styracosaurus albertensis',c:'h',p:'ceratops',per:'Cretáceo Superior',ma:'75,5–75',L:5.5,W:'~2,7 t',loc:'Canadá (Alberta)',diet:['Cicadáceas','Samambaias','Palmeiras'],teeth:'Baterias de dentes cortantes e um bico córneo.',f:'Seis espinhos longos no babado do crânio e um chifre de cerca de 60 cm no nariz.',k:{horn:'multi',col:['#8a7a56','#d08a4a']}},
+{n:'Protoceratops',s:'Protoceratops andrewsi',c:'h',p:'ceratops',per:'Cretáceo Superior',ma:'75–71',L:1.8,W:'~180 kg',loc:'Mongólia',diet:['Plantas rasteiras duras','Raízes','Cicadáceas'],teeth:'Dentes cortantes e um bico forte.',f:'Um fóssil famoso o mostra preso em combate com um Velociraptor.',k:{horn:'none',col:['#8d7c5a','#c9b27a']}},
+{n:'Parasaurolophus',s:'Parasaurolophus walkeri',c:'h',p:'ornitho',per:'Cretáceo Superior',ma:'76–73',L:10,W:'2,5–3,5 t',loc:'EUA e Canadá',diet:['Coníferas','Samambaias','Cicadáceas','Folhas e galhos'],teeth:'Bateria de centenas de dentes para triturar plantas.',f:'A crista oca, de até cerca de 1,6 m, funcionava como câmara de ressonância para sons graves.',k:{crest:'tube',beak:1,col:['#6f8d63','#d7a25a']}},
+{n:'Edmontosaurus',s:'Edmontosaurus regalis',c:'h',p:'ornitho',per:'Cretáceo Superior',ma:'73–66',L:10,W:'3–4 t',loc:'EUA e Canadá',diet:['Coníferas','Galhos e folhas','Sementes e frutos'],teeth:'Mais de mil dentes em baterias de moagem, atrás de um bico largo.',f:'Múmias fossilizadas mostram a pele coberta por pequenas escamas.',k:{beak:1,duck:1,col:['#78905c','#c2b06a']}},
+{n:'Iguanodon',s:'Iguanodon bernissartensis',c:'h',p:'ornitho',per:'Cretáceo Inferior',ma:'126–125',L:10,W:'3–5 t',loc:'Bélgica e Inglaterra',diet:['Cavalinhas','Samambaias','Cicadáceas','Coníferas'],teeth:'Dentes de moagem e um bico córneo.',f:'Os polegares em forma de espigão provavelmente serviam de defesa.',k:{beak:1,thumb:1,fore:1.2,col:['#7a8760','#b9a768']}},
+{n:'Maiasaura',s:'Maiasaura peeblesorum',c:'h',p:'ornitho',per:'Cretáceo Superior',ma:'76–75',L:9,W:'3–4 t',loc:'EUA (Montana)',diet:['Folhas','Frutos','Sementes'],teeth:'Baterias de dentes de moagem e um bico em forma de pato.',f:'O nome significa "boa mãe lagarto": ninhos fósseis indicam cuidado com os filhotes.',k:{beak:1,duck:1,col:['#6f8a5e','#c9b87a']}},
+{n:'Ouranosaurus',s:'Ouranosaurus nigeriensis',c:'h',p:'ornitho',per:'Cretáceo Inferior',ma:'125',L:7,W:'~4 t',loc:'Níger',diet:['Plantas baixas','Samambaias','Cicadáceas'],teeth:'Dentes de moagem e um bico largo.',f:'Tinha uma vela ou corcova nas costas, sustentada por espinhos das vértebras.',k:{sail:1,beak:1,duck:1,col:['#8a8458','#cc8a4a']}},
+{n:'Pachycephalosaurus',s:'Pachycephalosaurus wyomingensis',c:'h',p:'ornitho',per:'Cretáceo Superior',ma:'70–66',L:4.5,W:'400–450 kg',loc:'EUA (Wyoming, Montana)',diet:['Folhas','Frutos','Sementes','Possivelmente insetos'],teeth:'Dentes pequenos e serrilhados.',f:'O crânio tinha um domo ósseo muito grosso, que pode ter servido em disputas ou exibição.',k:{dome:1,tail:1,neck:0.7,col:['#8c7458','#c9a36a']}},
+{n:'Amargasaurus',s:'Amargasaurus cazaui',c:'h',p:'sauropod',per:'Cretáceo Inferior',ma:'129–122',L:9.5,W:'~2,6 t',loc:'Argentina (Neuquén)',diet:['Samambaias','Cicadáceas','Plantas baixas'],teeth:'Dentes pequenos em forma de lápis.',f:'Tinha duas fileiras de espinhos altos ao longo do pescoço.',k:{neckSpikes:1,nang:0.2,neck:0.5,tail:0.8,col:['#7a8c5e','#d19a4e']}},
+{n:'Therizinosaurus',s:'Therizinosaurus cheloniformis',c:'h',p:'theropod',per:'Cretáceo Superior',ma:'70',L:9.5,W:'3–5 t',loc:'Mongólia',diet:['Folhas','Galhos','Plantas macias'],teeth:'Dentes pequenos em forma de folha e um bico córneo.',f:'As garras, de até cerca de 50 cm, são as maiores de qualquer animal conhecido.',k:{arms:'long',herb:1,neck:1.3,col:['#8a7a52','#cfae66']}},
+{n:'Gallimimus',s:'Gallimimus bullatus',c:'h',p:'theropod',per:'Cretáceo Superior',ma:'70',L:6,W:'~440 kg',loc:'Mongólia',diet:['Plantas','Sementes','Pequenos animais e insetos'],teeth:'Sem dentes; tinha um bico córneo.',f:'Era veloz e talvez corresse perto de 50 km/h, como um avestruz gigante.',k:{herb:1,beak:1,neck:1.5,arms:'mid',bulk:0.7,col:['#8c7d58','#cfc08a']}}
+];
+/* Catálogo: carnívoros e répteis marinhos */
+DINOS.push(
+{n:'Tyrannosaurus rex',s:'Tyrannosaurus rex',c:'c',p:'theropod',per:'Cretáceo Superior',ma:'68–66',L:12,W:'8–9 t',loc:'EUA e Canadá',diet:['Triceratops','Edmontosaurus','Carniça'],teeth:'Dentes grossos de até cerca de 30 cm (com raiz), feitos para esmagar ossos.',f:'A mordida passava de 35 mil newtons, uma das mais fortes entre animais terrestres.',k:{arms:'tiny',bulk:1.15,col:['#7b5a3e','#d9a85f']}},
+{n:'Spinosaurus',s:'Spinosaurus aegyptiacus',c:'c',p:'theropod',per:'Cretáceo Superior',ma:'99–93',L:14,W:'6–7 t',loc:'Egito e Marrocos',diet:['Peixes grandes','Pterossauros','Pequenos dinossauros'],teeth:'Dentes cônicos e retos, bons para agarrar peixes.',f:'Passava muito tempo na água e a cauda tinha formato de remo.',k:{sail:1,snout:1.4,arms:'mid',tail:1.1,col:['#4f6f6a','#c85a3a']}},
+{n:'Allosaurus',s:'Allosaurus fragilis',c:'c',p:'theropod',per:'Jurássico Superior',ma:'155–145',L:8.5,W:'1,5–2,3 t',loc:'EUA e Portugal',diet:['Saurópodes jovens','Estegossauros','Ornitópodes'],teeth:'Dentes curvos e serrilhados como facas.',f:'Atacava com golpes descendentes do crânio, como um machado.',k:{arms:'mid',col:['#8a5a3a','#d2a05a']}},
+{n:'Giganotosaurus',s:'Giganotosaurus carolinii',c:'c',p:'theropod',per:'Cretáceo Superior',ma:'99–97',L:12.5,W:'6–8 t',loc:'Argentina (Neuquén)',diet:['Titanossauros jovens','Grandes herbívoros'],teeth:'Dentes em lâmina, serrilhados.',f:'Um dos maiores carnívoros terrestres; o crânio tinha perto de 1,6 m.',k:{arms:'small',col:['#6f5846','#c99a58']}},
+{n:'Carcharodontosaurus',s:'Carcharodontosaurus saharicus',c:'c',p:'theropod',per:'Cretáceo Superior',ma:'100–93',L:12.5,W:'~6 t',loc:'Marrocos, Argélia, Egito',diet:['Titanossauros','Grandes herbívoros'],teeth:'Dentes grandes em lâmina, como os do tubarão-branco.',f:'O nome significa "lagarto de dentes de tubarão".',k:{arms:'small',col:['#8a5e40','#d4a964']}},
+{n:'Mapusaurus',s:'Mapusaurus roseae',c:'c',p:'theropod',per:'Cretáceo Superior',ma:'97–93',L:11,W:'3–5 t',loc:'Argentina (Neuquén)',diet:['Titanossauros'],teeth:'Dentes em lâmina, serrilhados.',f:'Vários indivíduos achados juntos sugerem, para alguns cientistas, caça em grupo.',k:{arms:'small',col:['#6a5a4a','#c2955a']}},
+{n:'Tarbosaurus',s:'Tarbosaurus bataar',c:'c',p:'theropod',per:'Cretáceo Superior',ma:'70',L:11,W:'4–5 t',loc:'Mongólia',diet:['Hadrossauros','Titanossauros'],teeth:'Dentes grossos e fortes, de mordida esmagadora.',f:'Parente asiático do T. rex, com braços ainda menores.',k:{arms:'tiny',bulk:1.1,col:['#7a604a','#cfa062']}},
+{n:'Albertosaurus',s:'Albertosaurus sarcophagus',c:'c',p:'theropod',per:'Cretáceo Superior',ma:'71–69',L:9,W:'1,3–2 t',loc:'Canadá (Alberta)',diet:['Hadrossauros','Ceratopsídeos jovens'],teeth:'Dentes curvos e serrilhados.',f:'Um sítio com vários indivíduos juntos sugere que viviam em grupos.',k:{arms:'tiny',bulk:0.9,col:['#7d5e44','#d1a45f']}},
+{n:'Yutyrannus',s:'Yutyrannus huali',c:'c',p:'theropod',per:'Cretáceo Inferior',ma:'125',L:9,W:'~1,4 t',loc:'China (Liaoning)',diet:['Herbívoros médios'],teeth:'Dentes em lâmina, serrilhados.',f:'Um dos maiores dinossauros com penas conhecidos.',k:{arms:'tiny',feathers:1,col:['#9a6a4a','#e6c27a']}},
+{n:'Carnotaurus',s:'Carnotaurus sastrei',c:'c',p:'theropod',per:'Cretáceo Superior',ma:'72–69',L:7.8,W:'1,3–2 t',loc:'Argentina (Chubut)',diet:['Herbívoros médios','Saurópodes jovens','Animais pequenos'],teeth:'Dentes pequenos e crânio curto e alto.',f:'Tinha chifres sobre os olhos e braços muito curtos.',k:{horn:'brow',arms:'tiny',snout:0.6,col:['#9a4f3a','#e0b25e']}},
+{n:'Ceratosaurus',s:'Ceratosaurus nasicornis',c:'c',p:'theropod',per:'Jurássico Superior',ma:'153–148',L:5.8,W:'500–1000 kg',loc:'EUA e Portugal',diet:['Peixes','Herbívoros','Dinossauros jovens'],teeth:'Dentes longos e curvos.',f:'Tinha um chifre sobre o nariz e pequenos chifres sobre os olhos.',k:{horn:'nose',arms:'mid',col:['#7a6a3e','#d19a4a']}},
+{n:'Baryonyx',s:'Baryonyx walkeri',c:'c',p:'theropod',per:'Cretáceo Inferior',ma:'130–125',L:8.5,W:'1,2–1,7 t',loc:'Inglaterra',diet:['Peixes','Pequenos dinossauros','Carniça'],teeth:'Dentes cônicos sem serrilha, para agarrar peixes.',f:'Uma garra de cerca de 31 cm no polegar deu o nome: "garra pesada".',k:{snout:1.4,arms:'mid',col:['#5f7a68','#c9a35a']}},
+{n:'Suchomimus',s:'Suchomimus tenerensis',c:'c',p:'theropod',per:'Cretáceo Inferior',ma:'125–112',L:10.5,W:'2,5–5 t',loc:'Níger',diet:['Peixes grandes','Pequenos dinossauros'],teeth:'Mais de cem dentes cônicos num focinho de crocodilo.',f:'O nome significa "imitador de crocodilo".',k:{sail:0.5,snout:1.4,arms:'mid',col:['#6a7a5a','#d4a55e']}},
+{n:'Irritator',s:'Irritator challengeri',c:'c',p:'theropod',per:'Cretáceo Inferior',ma:'113–110',L:7,W:'~1 t',loc:'Brasil (Chapada do Araripe)',diet:['Peixes','Pterossauros'],teeth:'Dentes cônicos e retos, sem serrilha.',f:'O nome lembra a irritação dos cientistas ao ver o fóssil adulterado por comerciantes.',k:{sail:0.35,snout:1.5,arms:'mid',col:['#5a7a78','#d29a4a']}},
+{n:'Majungasaurus',s:'Majungasaurus crenatissimus',c:'c',p:'theropod',per:'Cretáceo Superior',ma:'70–66',L:6.5,W:'~1,1 t',loc:'Madagascar',diet:['Titanossauros','Outros Majungasaurus'],teeth:'Dentes curtos e curvos.',f:'Marcas de dentes em ossos mostram canibalismo.',k:{horn:'nose',snout:0.7,arms:'tiny',col:['#8a5a44','#d2a35c']}},
+{n:'Dilophosaurus',s:'Dilophosaurus wetherilli',c:'c',p:'theropod',per:'Jurássico Inferior',ma:'193',L:7,W:'~400 kg',loc:'EUA (Arizona)',diet:['Pequenos répteis','Peixes','Herbívoros pequenos'],teeth:'Dentes finos e curvos.',f:'Duas cristas finas na cabeça; a ideia de cuspir veneno vem do cinema, não de fósseis.',k:{crest:'twin',arms:'mid',bulk:0.75,col:['#6a7a4a','#d89a46']}},
+{n:'Herrerasaurus',s:'Herrerasaurus ischigualastensis',c:'c',p:'theropod',per:'Triássico Superior',ma:'231–228',L:4,W:'200–350 kg',loc:'Argentina (San Juan)',diet:['Pequenos répteis','Rincossauros','Herbívoros pequenos'],teeth:'Dentes curvos e serrilhados.',f:'Um dos dinossauros mais antigos conhecidos.',k:{arms:'mid',bulk:0.6,col:['#8a6a46','#d2b068']}},
+{n:'Staurikosaurus',s:'Staurikosaurus pricei',c:'c',p:'theropod',per:'Triássico Superior',ma:'233',L:2.2,W:'~30 kg',loc:'Brasil (Rio Grande do Sul)',diet:['Pequenos répteis','Animais pequenos'],teeth:'Dentes curvos e afiados.',f:'Um dos dinossauros mais antigos do Brasil, achado em Santa Maria (RS).',k:{arms:'mid',bulk:0.5,col:['#8a6648','#d6b46a']}},
+{n:'Coelophysis',s:'Coelophysis bauri',c:'c',p:'theropod',per:'Triássico Superior',ma:'216–203',L:3,W:'20–30 kg',loc:'EUA (Novo México)',diet:['Lagartos','Pequenos répteis','Insetos'],teeth:'Dentes pequenos, curvos e serrilhados.',f:'Centenas de esqueletos foram achados juntos em Ghost Ranch, no Novo México.',k:{arms:'mid',bulk:0.45,neck:1.3,col:['#8a7a5a','#d8c08a']}},
+{n:'Compsognathus',s:'Compsognathus longipes',c:'c',p:'theropod',per:'Jurássico Superior',ma:'150',L:1,W:'~3 kg',loc:'Alemanha e França',diet:['Lagartos','Insetos'],teeth:'Dentes pequenos e afiados.',f:'Um fóssil guarda um lagarto no abdômen, a última refeição.',k:{arms:'mid',bulk:0.4,neck:1.2,col:['#7a7a50','#d4c27a']}},
+{n:'Velociraptor',s:'Velociraptor mongoliensis',c:'c',p:'theropod',per:'Cretáceo Superior',ma:'75–71',L:2,W:'15–20 kg',loc:'Mongólia e China',diet:['Pequenos dinossauros','Lagartos','Mamíferos pequenos','Carniça'],teeth:'Dentes curvos e serrilhados.',f:'Tinha penas nos braços e uma garra em foice de cerca de 6,5 cm em cada pé.',k:{arms:'mid',bulk:0.4,feathers:1,sickle:1,col:['#8a6a46','#d8b870']}},
+{n:'Deinonychus',s:'Deinonychus antirrhopus',c:'c',p:'theropod',per:'Cretáceo Inferior',ma:'115–108',L:3.4,W:'60–100 kg',loc:'EUA (Montana, Wyoming)',diet:['Tenontosaurus','Pequenos dinossauros'],teeth:'Dentes curvos e serrilhados.',f:'A descoberta, nos anos 1960, mudou a imagem de dinossauros lentos e reforçou o elo com as aves.',k:{arms:'mid',bulk:0.5,feathers:1,sickle:1,col:['#7a5a48','#d4a868']}},
+{n:'Utahraptor',s:'Utahraptor ostrommaysorum',c:'c',p:'theropod',per:'Cretáceo Inferior',ma:'126–124',L:6,W:'~500 kg',loc:'EUA (Utah)',diet:['Herbívoros médios','Iguanodontes jovens'],teeth:'Dentes curvos e serrilhados.',f:'O maior dromeossaurídeo conhecido, com garra em foice de cerca de 24 cm.',k:{arms:'mid',bulk:0.6,feathers:1,sickle:1.6,col:['#6a5a4a','#cfa866']}},
+{n:'Oviraptor',s:'Oviraptor philoceratops',c:'c',p:'theropod',per:'Cretáceo Superior',ma:'75–71',L:1.6,W:'~33 kg',loc:'Mongólia',diet:['Pequenos animais','Plantas','Moluscos'],teeth:'Sem dentes; tinha um bico forte.',f:'O nome "ladrão de ovos" foi um engano: o fóssil estava chocando o próprio ninho.',k:{arms:'mid',beak:1,crest:'low',bulk:0.45,feathers:1,col:['#8a6a4a','#d6a05a']}},
+{n:'Microraptor',s:'Microraptor gui',c:'c',p:'theropod',per:'Cretáceo Inferior',ma:'120',L:0.8,W:'~1 kg',loc:'China (Liaoning)',diet:['Peixes','Aves pequenas','Mamíferos pequenos','Lagartos'],teeth:'Dentes pequenos e curvos.',f:'Tinha penas nos quatro membros, formando quatro "asas".',k:{arms:'mid',bulk:0.35,feathers:1,wings4:1,col:['#3a4a5e','#6a8aa8']}},
+{n:'Mosasaurus',s:'Mosasaurus hoffmannii',c:'m',p:'mosa',per:'Cretáceo Superior',ma:'82–66',L:13,W:'—',loc:'Europa e América do Norte',diet:['Peixes','Tubarões','Amonites','Tartarugas marinhas','Outros mosassauros'],teeth:'Dentes cônicos fortes, também no céu da boca.',f:'Era um lagarto marinho gigante, parente de varanos e cobras, e não um dinossauro.',k:{col:['#4a6f80','#c8d6d8']}},
+{n:'Tylosaurus',s:'Tylosaurus proriger',c:'m',p:'mosa',per:'Cretáceo Superior',ma:'86–78',L:13,W:'—',loc:'EUA (mar interior do Kansas)',diet:['Peixes','Tartarugas marinhas','Tubarões','Aves marinhas'],teeth:'Dentes cônicos curvos para segurar presas escorregadias.',f:'Tinha uma ponta óssea alongada no focinho.',k:{snout:1.2,col:['#4a6a6a','#c2d0c4']}},
+{n:'Elasmosaurus',s:'Elasmosaurus platyurus',c:'m',p:'plesio',per:'Cretáceo Superior',ma:'80',L:10,W:'~2 t',loc:'EUA (Kansas)',diet:['Peixes pequenos','Lulas','Moluscos'],teeth:'Dentes finos e pontudos para pegar peixes.',f:'O pescoço tinha 72 vértebras, o recorde entre répteis conhecidos.',k:{col:['#5a7a70','#cfd8c0']}},
+{n:'Liopleurodon',s:'Liopleurodon ferox',c:'m',p:'pliosaur',per:'Jurássico Médio',ma:'165–155',L:6.5,W:'1–1,7 t',loc:'Europa (Inglaterra, França)',diet:['Ictiossauros','Plesiossauros','Peixes'],teeth:'Dentes cônicos grandes, em fileiras duplas.',f:'Era um plesiossauro de pescoço curto e cabeça enorme, chamado de pliossauro.',k:{col:['#4a5f78','#b8c8d2']}},
+{n:'Kronosaurus',s:'Kronosaurus queenslandicus',c:'m',p:'pliosaur',per:'Cretáceo Inferior',ma:'125–100',L:9.5,W:'—',loc:'Austrália (Queensland)',diet:['Plesiossauros','Tartarugas marinhas','Lulas'],teeth:'Dentes cônicos grossos e fortes.',f:'O nome vem de Cronos, o titã da mitologia grega.',k:{col:['#3f5a6a','#b0c2c8']}},
+{n:'Pliosaurus',s:'Pliosaurus funkei',c:'m',p:'pliosaur',per:'Jurássico Superior',ma:'150',L:10,W:'—',loc:'Noruega (Svalbard)',diet:['Ictiossauros','Plesiossauros','Peixes'],teeth:'Dentes enormes e cônicos, de seção arredondada.',f:'Um dos maiores pliossauros já achados, apelidado "O Monstro".',k:{col:['#3f6070','#b6c8cc']}},
+{n:'Ichthyosaurus',s:'Ichthyosaurus communis',c:'m',p:'ichthyo',per:'Jurássico Inferior',ma:'200–190',L:2,W:'~90 kg',loc:'Inglaterra',diet:['Peixes','Lulas'],teeth:'Muitos dentes pequenos e cônicos.',f:'Fósseis mostram fêmeas dando à luz filhotes já vivos, dentro d’água.',k:{col:['#4a6a82','#d0dce0']}},
+{n:'Ophthalmosaurus',s:'Ophthalmosaurus icenicus',c:'m',p:'ichthyo',per:'Jurássico Médio',ma:'165–150',L:5.5,W:'~1 t',loc:'Inglaterra',diet:['Lulas','Belemnites','Peixes'],teeth:'Dentes pequenos ou ausentes; capturava presas macias.',f:'Tinha olhos enormes, bons para enxergar em águas profundas.',k:{bigEye:1,col:['#3f5f78','#c6d4d8']}},
+{n:'Shonisaurus',s:'Shonisaurus popularis',c:'m',p:'ichthyo',per:'Triássico Superior',ma:'215–205',L:15,W:'~30 t',loc:'EUA (Nevada)',diet:['Lulas','Peixes'],teeth:'Poucos dentes, só nas pontas das mandíbulas.',f:'Um dos maiores ictiossauros; a jazida é hoje um parque estadual em Nevada.',k:{col:['#3a5a70','#b6c6cc']}}
+);
+/* Modelos 3D procedurais. build(dino, 'body'|'bone') devolve {group, parts, marine} */
+const PLANS = {
+  theropod:{bip:1,hip:[0,3.5],sh:[2.0,3.7],tailLen:5.6,tailRise:.3,tailDrop:.8,neckLen:2.1,nA0:.95,nA1:-.1,tr:1.05,ry:1.12,rz:.78,neckR:.36,hl:1.9,hh:.5,hw:.42,legLen:3.5,arms:'small',teeth:'blade',ribs:9,sailBase:1},
+  sauropod:{quad:1,hip:[0,4.2],sh:[3.2,4.4],tailLen:7.5,tailRise:.2,tailDrop:2.2,neckLen:6.8,nA0:.62,nA1:.12,tr:1.25,ry:1.05,rz:.95,neckR:.3,hl:1.15,hh:.36,hw:.3,legLen:3.9,teeth:'peg',ribs:11,thick:1},
+  ornitho:{semi:1,hip:[0,3.3],sh:[2.4,3.4],tailLen:4.6,tailRise:.15,tailDrop:.6,neckLen:1.9,nA0:.7,nA1:-.15,tr:.95,ry:1.1,rz:.8,neckR:.32,hl:1.7,hh:.42,hw:.38,legLen:3.2,teeth:'none',ribs:10,arms:'mid'},
+  ceratops:{quad:1,hip:[0,2.2],sh:[2.6,2.3],tailLen:3.1,tailRise:0,tailDrop:.3,neckLen:.5,nA0:0,nA1:-.1,tr:1.35,ry:1.0,rz:.95,neckR:.7,hl:2.2,hh:.6,hw:.5,legLen:2.1,teeth:'none',ribs:10,wide:0},
+  thyreo:{quad:1,hip:[0,2.6],sh:[2.8,2.5],tailLen:4.0,tailRise:.25,tailDrop:.3,neckLen:1.2,nA0:-.1,nA1:-.45,tr:1.2,ry:.95,rz:1.0,neckR:.42,hl:1.1,hh:.3,hw:.28,legLen:2.3,teeth:'none',ribs:10,rear:1},
+  plesio:{flip:1,hip:[0,1.9],sh:[1.8,1.9],tailLen:2.2,tailRise:0,tailDrop:0,neckLen:6.0,nA0:.45,nA1:-.45,tr:1.15,ry:.75,rz:1.05,neckR:.22,hl:.9,hh:.24,hw:.22,teeth:'peg',ribs:10,fl:[2.3,.8,1.9,.7]},
+  pliosaur:{flip:1,hip:[0,1.9],sh:[2.0,1.9],tailLen:2.0,tailRise:0,tailDrop:0,neckLen:1.0,nA0:0,nA1:-.1,tr:1.1,ry:.8,rz:.95,neckR:.55,hl:3.0,hh:.5,hw:.5,teeth:'croc',ribs:10,fl:[2.0,.7,1.9,.6]},
+  ichthyo:{flip:1,fluke:1,dorsal:1,hip:[0,1.6],sh:[2.6,1.6],tailLen:3.4,tailRise:0,tailDrop:0,neckLen:.5,nA0:0,nA1:0,tr:.95,ry:.95,rz:.62,neckR:.5,hl:2.4,hh:.32,hw:.3,teeth:'croc',ribs:9,fl:[1.3,.4,.7,.3]},
+  mosa:{flip:1,fluke:1,hip:[0,1.4],sh:[3.0,1.4],tailLen:5.4,tailRise:.3,tailDrop:0,neckLen:.6,nA0:0,nA1:0,tr:.55,ry:.95,rz:.8,neckR:.38,hl:2.3,hh:.4,hw:.4,teeth:'croc',ribs:11,fl:[1.0,.4,1.0,.4]}
+};
+const DEFAULT_COL = {h:['#6f8f55','#c9b36a'],c:['#a4553b','#e0b36a'],m:['#3f7f9a','#cfe0e4']};
+
+function buildDino(d, mode){
+  const T = THREE;
+  const V = (x,y,z)=>new T.Vector3(x,y,z);
+  const sk = mode === 'bone';
+  const base = PLANS[d.p];
+  const k = Object.assign({}, base, d.k || {});
+  const colArr = (d.k && d.k.col) || DEFAULT_COL[d.c];
+  const COL = {skin:new T.Color(colArr[0]), accent:new T.Color(colArr[1])};
+  const root = new T.Group();
+  const parts = {};
+  let seed = 7; const rnd = ()=>{ seed = (seed*16807)%2147483647; return seed/2147483647; };
+  const geoSph = new T.SphereGeometry(1,16,12);
+
+  function mat(part, kind){
+    if(!parts[part]) parts[part] = {meshes:[], mats:{}};
+    const P = parts[part];
+    if(!P.mats[kind]){
+      let c, rough = .78;
+      if(kind==='skin') c = sk ? new T.Color('#e6dcc0') : COL.skin;
+      else if(kind==='accent') c = sk ? new T.Color('#d8cba6') : COL.accent;
+      else if(kind==='bone'){ c = new T.Color('#e9e1c9'); rough = .55; }
+      else if(kind==='claw') c = sk ? new T.Color('#e9e1c9') : new T.Color('#3a3029');
+      else if(kind==='horn') c = sk ? new T.Color('#e9e1c9') : new T.Color('#d9cfb2');
+      else if(kind==='tooth') c = new T.Color('#f1edde');
+      else if(kind==='eyew') c = new T.Color('#f4f0e2');
+      else c = new T.Color('#17120f');
+      P.mats[kind] = new T.MeshStandardMaterial({color:c, roughness:rough, metalness:0});
+    }
+    return P.mats[kind];
+  }
+  function reg(m, part, parent){ m.userData.part = part; parts[part].meshes.push(m); (parent||root).add(m); return m; }
+  function ell(part, kind, p, s, parent){
+    const m = new T.Mesh(geoSph, mat(part,kind)); m.position.copy(p); m.scale.set(s[0],s[1],s[2]); return reg(m, part, parent);
+  }
+  function seg(part, kind, a, b, r1, r2, parent){
+    const dir = b.clone().sub(a); const len = dir.length(); if(len < 1e-5) return null;
+    const m = new T.Mesh(new T.CylinderGeometry(r2,r1,len,8,1), mat(part,kind));
+    m.position.copy(a.clone().add(b).multiplyScalar(.5));
+    m.quaternion.setFromUnitVectors(V(0,1,0), dir.normalize());
+    return reg(m, part, parent);
+  }
+  function cone(part, kind, at, dir, r, h, parent){
+    const m = new T.Mesh(new T.ConeGeometry(r,h,8,1), mat(part,kind));
+    const dn = dir.clone().normalize();
+    m.position.copy(at.clone().add(dn.clone().multiplyScalar(h/2)));
+    m.quaternion.setFromUnitVectors(V(0,1,0), dn);
+    return reg(m, part, parent);
+  }
+
+  const tr = base.tr * (k.bulk || 1);
+  const ry = k.ry, rz = k.rz;
+  const hip = V(k.hip[0], k.hip[1], 0), sh = V(k.sh[0], k.sh[1], 0);
+  const prof = []; // perfil do dorso: {x, top}
+
+  /* ---------- trilhas da coluna ---------- */
+  const tl = k.tailLen * (k.tail || 1);
+  const tailPts = [];
+  for(let i=0;i<=6;i++){ const u=i/6; tailPts.push(V(hip.x - tl*u, hip.y + k.tailRise*Math.sin(u*Math.PI*.9) - k.tailDrop*u*u, 0)); }
+  const torsoPts = [hip.clone(), V((hip.x+sh.x)/2, (hip.y+sh.y)/2 + tr*.06, 0), sh.clone()];
+  const nl = k.neckLen * (k.neck || 1);
+  const a0 = k.nA0 + (k.nang || 0), a1 = k.nA1;
+  const neckPts = [sh.clone()]; let np = sh.clone();
+  for(let i=1;i<=7;i++){ const u=i/7; const a=a0+(a1-a0)*u; np = np.clone().add(V(Math.cos(a),Math.sin(a),0).multiplyScalar(nl/7)); neckPts.push(np); }
+  const headPos = neckPts[neckPts.length-1].clone();
+
+  const rTail = u => tr*.8*Math.pow(1-u,1.15) + tr*.035;
+  const rTorso = u => tr*(.92 + .22*Math.sin(Math.PI*u));
+  const neckR0 = Math.min(tr*.62, k.neckR*1.8) * (k.thick ? 1.1 : 1);
+  const rNeck = u => neckR0 + (k.neckR - neckR0)*Math.pow(u,.8);
+
+  function sample(pts, rf, f){
+    const c = new T.CatmullRomCurve3(pts); const len = c.getLength(); const out = []; let u = 0;
+    while(u < 1){ const r = rf(u); out.push({p:c.getPointAt(u), r, u, t:c.getTangentAt(u)}); u += Math.max(.06, r*f)/len; }
+    out.push({p:c.getPointAt(1), r:rf(1), u:1, t:c.getTangentAt(1)});
+    return {c, len, s:out};
+  }
+  function flesh(S, part, ryy, rzz, dark){
+    S.s.forEach(o=>{ ell(part, 'skin', o.p, [o.r, o.r*ryy, o.r*rzz]); });
+  }
+  function verts(S, part, o){
+    S.s.forEach((q,i)=>{
+      const up = o.up ? q.r*ry*o.up : 0;
+      const c = q.p.clone().add(V(0,up,0));
+      const len = Math.max(.1, q.r*o.spacing*.8);
+      const a = c.clone().sub(q.t.clone().multiplyScalar(len/2)), b = c.clone().add(q.t.clone().multiplyScalar(len/2));
+      seg(part,'bone',a,b,q.r*o.rv,q.r*o.rv*.95);
+      if(o.ns) cone(part,'bone',c,V(-.15,1,0),q.r*.08,q.r*ry*o.ns);
+      if(o.chev) cone(part,'bone',c,V(-.2,-1,0),q.r*.07,q.r*o.chev);
+    });
+  }
+
+  const f = sk ? .95 : .55;
+  const tailS = sample(tailPts, rTail, f);
+  const torsoS = sample(torsoPts, rTorso, f);
+  const neckS = sample(neckPts, rNeck, f);
+  tailS.s.forEach(o=>prof.push({x:o.p.x, top:o.p.y + o.r*ry}));
+  torsoS.s.forEach(o=>prof.push({x:o.p.x, top:o.p.y + o.r*ry}));
+  const topAt = x => { let b = prof[0], bd = 1e9; prof.forEach(q=>{ const dd = Math.abs(q.x-x); if(dd<bd){bd=dd;b=q;} }); return b.top; };
+
+  if(!sk){
+    flesh(tailS,'tail',ry,rz); flesh(torsoS,'torso',ry,rz); flesh(neckS,'neck',1,1);
+  } else {
+    verts(tailS,'tail',{rv:.34,spacing:1,ns:.5,chev:.8});
+    verts(torsoS,'torso',{rv:.3,spacing:1,up:.42,ns:.62});
+    verts(neckS,'neck',{rv:.5,spacing:1,ns:.0});
+    // costelas
+    const n = k.ribs;
+    for(let i=0;i<n;i++){
+      const u = .08 + .84*i/(n-1); const p = torsoS.c.getPointAt(u); const R = rTorso(u);
+      const y0 = p.y + R*ry*.42, y1 = p.y - R*ry*.95;
+      [-1,1].forEach(s=>{
+        const pts = [];
+        for(let j=0;j<=8;j++){ const ph = (j/8)*Math.PI*.92; pts.push(V(p.x - .05*R*(j/8), y0 - (y0-y1)*(1-Math.cos(ph))/2, s*R*rz*.95*Math.sin(ph))); }
+        const g = new T.TubeGeometry(new T.CatmullRomCurve3(pts), 10, Math.max(.03, tr*.045), 5, false);
+        reg(new T.Mesh(g, mat('ribs','bone')), 'ribs');
+      });
+    }
+    // pelve
+    [-1,1].forEach(s=>{
+      const z = s*tr*rz*.5;
+      ell('pelvis','bone', V(hip.x, hip.y + tr*ry*.15, z), [tr*.95, tr*.38, .1]);
+      seg('pelvis','bone', V(hip.x+tr*.1, hip.y - tr*.1, z), V(hip.x+tr*.95, hip.y - tr*1.15, z), tr*.1, tr*.07);
+      seg('pelvis','bone', V(hip.x-tr*.1, hip.y - tr*.1, z), V(hip.x-tr*.85, hip.y - tr*1.05, z), tr*.1, tr*.06);
+    });
+  }
+
+  /* ---------- cabeça ---------- */
+  {
+    const hl = k.hl * (k.snout || 1), hh = k.hh, hw = k.hw;
+    const hg = new T.Group(); hg.position.copy(headPos); hg.rotation.z = a1; root.add(hg);
+    const duck = !!(k.duck || k.wide);
+    const E = (part,kind,p,s)=>ell(part,kind,V(p[0],p[1],p[2]),s,hg);
+    const C = (part,kind,at,dir,r,h)=>cone(part,kind,V(at[0],at[1],at[2]),V(dir[0],dir[1],dir[2]),r,h,hg);
+    E('skull','skin',[hl*.18,0,0],[hl*.38,hh*.95,hw]);
+    E('skull','skin',[hl*.55,-hh*.08,0],[hl*.5, duck?hh*.32:hh*.55, duck?hw*1.15:hw*.62]);
+    E('jaw','skin',[hl*.45,-hh*.58,0],[hl*.46,hh*.22,hw*.58]);
+    const eyeR = hh*.16*(k.bigEye?2.3:1);
+    [-1,1].forEach(s=>{
+      if(sk){ E('eye','dark',[hl*.27,hh*.3,s*hw*.78],[eyeR*1.3,eyeR*1.3,eyeR*.6]); }
+      else { E('eye','eyew',[hl*.27,hh*.3,s*hw*.8],[eyeR,eyeR,eyeR*.7]); E('eye','dark',[hl*.28,hh*.3,s*hw*.9],[eyeR*.55,eyeR*.55,eyeR*.4]); }
+    });
+    const tt = k.teeth;
+    if(tt && tt!=='none' && !k.herb && !k.beak){
+      const n = tt==='blade'?7 : tt==='croc'?12 : 4;
+      const sz = tt==='blade'? hh*.34 : tt==='croc'? hh*.3 : hh*.2;
+      for(let i=0;i<n;i++){
+        const x = hl*(.3 + .62*i/(n-1));
+        [-1,1].forEach(s=>{
+          C('teeth','tooth',[x,-hh*.5,s*hw*.46],[.1,-1,0],hh*.075,sz*(1-.3*i/n));
+          if(tt==='croc') C('teeth','tooth',[x,-hh*.62,s*hw*.4],[.1,1,0],hh*.06,sz*.8);
+        });
+      }
+    } else if(!k.beak && !k.herb && tt==='peg'){}
+    if(k.beak || k.herb || d.p==='ceratops'){
+      E('skull','accent',[hl*.95,-hh*.18,0],[duck?hl*.28:hl*.14, duck?hh*.2:hh*.38, duck?hw*1.1:hw*.5]);
+    }
+    if(d.p==='ceratops'){
+      const big = (k.horn==='none') ? .6 : 1;
+      const fr = ell('frill','accent',V(-hl*.12,hh*.85,0),[hl*.07,hh*1.45*big,hw*1.9*big],hg); fr.rotation.z = -.42;
+      if(k.horn==='tri'){
+        [-1,1].forEach(s=>C('horns','horn',[hl*.32,hh*.55,s*hw*.72],[1,.5,s*.12],hh*.17,hl*.7));
+        C('horns','horn',[hl*.82,hh*.2,0],[.45,1,0],hh*.17,hl*.2);
+      } else if(k.horn==='multi'){
+        C('horns','horn',[hl*.82,hh*.2,0],[.15,1,0],hh*.15,hl*.62);
+        for(let i=0;i<7;i++){ const th = -1.2 + 2.4*i/6; const ang = Math.PI/2 + th*.62;
+          const px = -hl*.12 - Math.sin(.42)*0, py = hh*.85 + Math.cos(th*.6)*hh*1.3*.6;
+          C('horns','horn',[px-.0, hh*.85+Math.sin(Math.abs(th))*0.0 + hh*1.0*Math.cos(th*.9), Math.sin(th)*hw*1.5],[-.55,Math.cos(th*.7),Math.sin(th)*1.2],hh*.1,hl*(.35 + .2*Math.cos(th)));
+        }
+      }
+    } else if(k.horn==='nose'){
+      C('horns','horn',[hl*.78,hh*.22,0],[.35,1,0],hh*.15,hh*1.0);
+    } else if(k.horn==='brow'){
+      [-1,1].forEach(s=>C('horns','horn',[hl*.3,hh*.8,s*hw*.72],[.4,1,s*.35],hh*.17,hh*1.1));
+    }
+    if(k.crest==='tube'){
+      const cc = new T.CatmullRomCurve3([V(hl*.62,hh*.5,0),V(hl*.45,hh*1.3,0),V(-hl*.15,hh*1.65,0),V(-hl*.8,hh*1.2,0),V(-hl*1.15,hh*.35,0)]);
+      reg(new T.Mesh(new T.TubeGeometry(cc,24,hh*.3,8,false), mat('crest','accent')), 'crest', hg);
+    } else if(k.crest==='twin'){
+      [-1,1].forEach(s=>ell('crest','accent',V(hl*.15,hh*1.1,s*hw*.3),[hl*.38,hh*.55,.04],hg));
+    } else if(k.crest==='low'){
+      ell('crest','accent',V(hl*.32,hh*1.05,0),[hl*.3,hh*.5,.07],hg);
+    }
+    if(k.dome){
+      ell('dome','accent',V(hl*.2,hh*1.0,0),[hl*.32,hh*.95,hw*.95],hg);
+      for(let i=0;i<6;i++){ const s = i%2?1:-1; C('dome','horn',[-hl*.05 - i*.02, hh*.5, s*hw*.8],[-.6,.6,s],hh*.1,hh*.4); }
+    }
+  }
+
+  /* ---------- membros ---------- */
+  const gnd = .08;
+  function limb(pts, rads, part, o){
+    for(let i=0;i<pts.length-1;i++){
+      if(sk) seg(part,'bone',pts[i],pts[i+1],rads[i]*.32,rads[i+1]*.3);
+      else seg(part,'skin',pts[i],pts[i+1],rads[i],rads[i+1]);
+    }
+    pts.forEach((p,i)=>{ ell(part, sk?'bone':'skin', p, sk?[rads[i]*.5,rads[i]*.5,rads[i]*.5]:[rads[i]*1.02,rads[i]*1.02,rads[i]*1.02]); });
+    const end = pts[pts.length-1], prev = pts[pts.length-2];
+    const dir = end.clone().sub(prev).normalize();
+    const nT = o.toes || 3;
+    for(let j=0;j<nT;j++){
+      const sp = (j-(nT-1)/2)*(o.spread||.28);
+      const tip = end.clone().add(V(dir.x*o.toeLen, Math.max(gnd-end.y, -.02), sp*o.toeLen)).add(V(0,0,0));
+      if(o.toeLen>0){
+        seg(part, sk?'bone':'skin', end, tip, rads[rads.length-1]*.7, rads[rads.length-1]*.45);
+        if(o.claw>0) cone('claws','claw', tip, V(dir.x+.4,-.25,sp*.5), o.claw*.55, o.claw*(o.hoof?.7:1.5));
+      }
+    }
+  }
+  const zs = tr*rz*.78;
+  const L = k.legLen || 3;
+  function biLeg(s){
+    const hy = hip.y - tr*ry*.4, hx = hip.x + .1;
+    const pts = [V(hx,hy,s*zs), V(hx+.22*L,hy-.42*(hy-gnd)/1,s*zs*.95), V(hx+.03*L,hy-.86*(hy-gnd),s*zs*.95), V(hx+.1,gnd+.03,s*zs*.95)];
+    pts[1].x = hx + .2*(hy-gnd); pts[2].x = hx + .02*(hy-gnd); pts[3].x = hx + .22*(hy-gnd);
+    limb(pts,[tr*.42,tr*.26,tr*.15,tr*.11],'hindleg',{toeLen:(hy-gnd)*.2,claw:(k.herb?.06:.11)*Math.max(.6,tr), spread:.3, hoof:!!k.herb && !k.sickle});
+    if(!sk) ell('hindleg','skin',V(hx,hy+.05,s*zs*.9),[tr*.55,tr*.55,tr*.4]);
+    if(k.sickle){ const t = pts[3]; cone('claws','claw',V(t.x+.1,t.y+.12,t.z),V(.45,-1,0),.05*k.sickle*Math.max(.7,tr),.5*k.sickle*Math.max(.7,tr)); }
+  }
+  function colLeg(x, y0, s, thick, len, part, sprawl){
+    const top = V(x, y0, s*zs), h = y0 - gnd;
+    const sp = sprawl ? s*.12*tr : 0;
+    const pts = [top, V(x+.03*h, y0-.5*h, s*zs+sp), V(x, y0-.88*h, s*zs+sp*.6), V(x+.04*h, gnd+.03, s*zs+sp*.4)];
+    limb(pts,[thick,thick*.72,thick*.58,thick*.55],part,{toeLen:h*.12,claw:thick*.2,toes:thick>.4?4:3,spread:.4,hoof:true});
+  }
+  function arm(s, len, tiny){
+    const top = V(sh.x+.15, sh.y - tr*ry*.5, s*zs*.8);
+    const pts = [top, V(top.x+.1*len, top.y-.55*len, top.z+s*.02), V(top.x+.55*len, top.y-.82*len, top.z+s*.04)];
+    const r = Math.max(.05, tr*.13*(len>2?1.2:1));
+    limb(pts,[r*1.4,r,r*.8],'foreleg',{toeLen:len*.18,claw:Math.max(.05,len*.06),toes:len>2?3:(tiny?2:3),spread:.35});
+  }
+
+  if(k.flip){
+    const fl = k.fl;
+    const flipper = (bx,by,len,wid,s,fwd)=>{
+      const dir = V(fwd?.15:-.4, -.3, s*1).normalize(); const base0 = V(bx,by,s*tr*rz*.8);
+      if(!sk){
+        const c = base0.clone().add(dir.clone().multiplyScalar(len/2));
+        const m = ell('flipper','accent',c,[len/2,.06,wid/2]); m.quaternion.setFromUnitVectors(V(1,0,0),dir);
+      } else {
+        for(let j=0;j<5;j++){ const sp = (j-2)*.2; const d2 = dir.clone().add(V(-sp*.8,0,0)).normalize(); const l2 = len*(1-Math.abs(j-2)*.06);
+          seg('flipper','bone',base0,base0.clone().add(d2.multiplyScalar(l2)),.05,.035);
+          ell('flipper','bone',base0.clone().add(d2.clone().normalize().multiplyScalar(l2)),[.06,.04,.06]); }
+        seg('flipper','bone',base0,base0.clone().add(dir.clone().multiplyScalar(len*.4)),.09,.06);
+      }
+    };
+    [-1,1].forEach(s=>{ flipper(sh.x-.2, sh.y-tr*ry*.6, fl[0], fl[1], s, true); flipper(hip.x+.2, hip.y-tr*ry*.6, fl[2], fl[3], s, false); });
+    if(k.fluke){
+      const tip = tailPts[tailPts.length-1]; const flk = tl*.17 + tr*.9;
+      if(!sk){
+        [1,-1].forEach(s=>{ const m = ell('fluke','accent',V(tip.x-.15,tip.y+s*flk*.45,0),[flk*.18,flk*.62,.05]); m.rotation.z = s*.42; });
+      } else {
+        [1,-1].forEach(s=>seg('fluke','bone',tip,V(tip.x-.4,tip.y+s*flk,0),.05,.03));
+      }
+    }
+    if(k.dorsal && !sk){ const p = torsoS.c.getPointAt(.45); const m = ell('fin','accent',V(p.x,p.y+tr*ry+.3,0),[.5,.55,.04]); m.rotation.z = .6; }
+  } else if(k.semi || k.bip){
+    [-1,1].forEach(s=>biLeg(s));
+    let a = k.arms;
+    const len = a==='long'?3.1 : a==='tiny'?.75 : a==='mid'?1.4 : a==='small'?1.0 : 1.5*(k.fore||1);
+    [-1,1].forEach(s=>arm(s,len,a==='tiny'));
+  } else {
+    const hf = sh.y - tr*ry*.3;
+    const thick = tr*(d.p==='sauropod'?.5:.42);
+    [-1,1].forEach(s=>{ colLeg(sh.x-.2, hf, s, thick, 1, 'foreleg', d.p!=='sauropod'); colLeg(hip.x, hip.y-tr*ry*.3, s, thick, 1, 'hindleg', d.p!=='sauropod'); });
+  }
+
+  /* ---------- acessórios ---------- */
+  const fullC = new T.CatmullRomCurve3([...tailPts.slice().reverse(), ...torsoPts.slice(1)]);
+  if(k.sail){
+    const n = 15;
+    for(let i=0;i<n;i++){
+      const u = .52 + .38*i/(n-1); const p = fullC.getPointAt(Math.min(u,1));
+      const h = k.sail * tr * (2.4*Math.sin(Math.PI*(i+.5)/n) + .3);
+      const top = topAt(p.x);
+      cone('sail','bone',V(p.x,top-.1,0),V(-.08,1,0),.05,h);
+      if(!sk && i<n-1){
+        const u2 = .52 + .38*(i+1)/(n-1); const p2 = fullC.getPointAt(Math.min(u2,1));
+        ell('sail','accent',V((p.x+p2.x)/2, top + h*.42, 0),[Math.abs(p.x-p2.x)*.62, h*.42, .025]);
+      }
+    }
+  }
+  if(k.plates){
+    const n = 17;
+    for(let i=0;i<n;i++){
+      const u = .3 + .55*i/(n-1); const p = fullC.getPointAt(u); const s = i%2?1:-1;
+      const h = k.plates*tr*(.55 + 1.15*Math.sin(Math.PI*(i+.5)/n));
+      const m = ell('plates', sk?'bone':'accent', V(p.x, topAt(p.x)+h*.4, s*.16), [h*.36, h*.5, .045]); m.rotation.x = s*.18; m.rotation.z = -.08;
+    }
+  }
+  if(k.spike){
+    const n = k.spike===2 ? 5 : 2;
+    for(let i=0;i<n;i++){
+      const p = tailS.c.getPointAt(.82 + .16*i/Math.max(1,n-1)); [-1,1].forEach(s=>cone('spikes','horn',V(p.x,p.y+.05,s*.12),V(-.55,.35,s*1.1),.1*tr,tr*1.05));
+    }
+    if(k.spike===2){ [-1,1].forEach(s=>{ cone('spikes','horn',V(hip.x+.1,topAt(hip.x)-.15,s*.4),V(-.3,.5,s*1.2),.1*tr,tr*1.2); cone('spikes','horn',V(sh.x-.3,topAt(sh.x-.3)-.15,s*.5),V(0,.4,s*1.2),.1*tr,tr*.9); }); }
+  }
+  if(k.club){
+    const p = tailPts[tailPts.length-1].clone().add(V(.5,.05,0));
+    ell('club','bone',p,[tr*.55,tr*.42,tr*.6]);
+    [-1,1].forEach(s=>ell('club','bone',p.clone().add(V(.15,0,s*tr*.55)),[tr*.2,tr*.2,tr*.2]));
+  }
+  if(k.armor){
+    for(let i=0;i<46;i++){
+      const x = hip.x - tl*.55*rnd() + (sh.x-hip.x+.8)*rnd()*(rnd()<.6?1:.2);
+      const top = topAt(x); const z = (rnd()-.5)*tr*rz*1.1;
+      const lift = Math.sqrt(Math.max(0,1-(z/(tr*rz*.65))**2));
+      cone('armor', sk?'bone':'accent', V(x, top-.25+lift*.28 - (1-lift)*.2, z), V(0,1,z*.6), tr*.075, tr*.28);
+    }
+  }
+  if(k.neckSpikes){
+    neckS.s.forEach((o,i)=>{ if(i%2) return; [-1,1].forEach(s=>cone('spikes',sk?'bone':'horn',o.p.clone().add(V(0,o.r*.8,s*o.r*.5)),V(-.3,1,s*.1),o.r*.1,o.r*(4.5 - 2.2*o.u))); });
+  }
+  if(k.feathers && !sk){
+    const tp = tailS.c; for(let i=0;i<7;i++){ const p = tp.getPointAt(.35+.62*i/6); [-1,1].forEach(s=>{ const m = ell('feathers','accent',V(p.x-.12,p.y+.02,s*.12),[.32,.025,.12]); m.rotation.y = s*(.2+.06*i); }); }
+    [-1,1].forEach(s=>{ for(let i=0;i<5;i++){ const m = ell('feathers','accent',V(sh.x+.35-i*.16,sh.y-tr*ry*.9-.15*i, s*(zs*.8+.1+.04*i)),[.1,.02,.38+.04*i]); m.rotation.x = s*.5; } });
+    if(k.wings4){ [-1,1].forEach(s=>{ for(let i=0;i<5;i++){ const m = ell('feathers','accent',V(hip.x-.1-i*.12,hip.y-tr*ry*.8-.1*i, s*(zs+.15+.05*i)),[.1,.02,.4]); m.rotation.x = s*.5; } }); }
+  }
+
+  /* ---------- ajuste final ---------- */
+  const box = new T.Box3().setFromObject(root);
+  const size = box.getSize(V(0,0,0)); const ctr = box.getCenter(V(0,0,0));
+  const sc = 10 / Math.max(size.x, size.y*1.3, size.z);
+  const wrap = new T.Group(); wrap.add(root);
+  root.position.set(-ctr.x, -box.min.y, -ctr.z);
+  wrap.scale.setScalar(sc);
+  const marine = !!k.flip;
+  wrap.position.y = marine ? 1.2 : 0;
+  return {group:wrap, parts, marine, size:size.clone().multiplyScalar(sc)};
+}
+if(typeof module !== 'undefined') module.exports = {buildDino, PLANS};
+/* ===== Interface do Atlas Paleo ===== */
+const CLASSES = {
+  h:{one:'Herbívoro', many:'Herbívoros'},
+  c:{one:'Carnívoro', many:'Carnívoros'},
+  m:{one:'Réptil marinho', many:'Répteis marinhos'}
+};
+const PART_ORDER = ['skull','jaw','teeth','eye','horns','frill','crest','dome','neck','torso','ribs','pelvis','tail','foreleg','hindleg','claws','plates','sail','spikes','armor','club','flipper','fluke','fin','feathers'];
+const PARTS = {
+  skull:{body:'Cabeça',bone:'Crânio',desc:'Protege o cérebro e sustenta olhos, nariz e mandíbula. O formato do crânio mostra o que o animal comia e como farejava.'},
+  jaw:{body:'Mandíbula',bone:'Mandíbula',desc:'Osso móvel da boca. Nos carnívoros fecha com muita força; nos herbívoros trabalha como um moedor.'},
+  teeth:{body:'Dentes',bone:'Dentes',desc:'Mostram a dieta. Lâminas serrilhadas cortam carne; pinos e espátulas arrancam folhas; baterias de dentes trituram plantas duras.'},
+  eye:{body:'Olho',bone:'Órbita do olho',desc:'Olhos voltados para a frente ajudam a medir distâncias, comuns em caçadores. Olhos nas laterais ampliam o campo de visão, comuns em presas.'},
+  horns:{body:'Chifres',bone:'Chifres',desc:'Ossos cobertos de queratina, usados em defesa, disputas e exibição.'},
+  frill:{body:'Babado ósseo',bone:'Babado ósseo',desc:'Placa de osso atrás da cabeça: protegia o pescoço e servia para exibição.'},
+  crest:{body:'Crista',bone:'Crista',desc:'Estrutura da cabeça usada para exibição e, em alguns hadrossauros, para produzir sons graves.'},
+  dome:{body:'Domo do crânio',bone:'Domo do crânio',desc:'Osso muito espesso no topo da cabeça, talvez usado em disputas ou exibição.'},
+  neck:{body:'Pescoço',bone:'Vértebras cervicais',desc:'Sustenta e move a cabeça. Nos saurópodes as vértebras tinham cavidades de ar, que reduziam o peso.'},
+  torso:{body:'Tronco',bone:'Coluna dorsal',desc:'Abriga os órgãos. Os espinhos das vértebras do dorso prendem músculos fortes.'},
+  ribs:{body:'Costelas',bone:'Costelas',desc:'Formam a caixa torácica, que protege coração e pulmões e ajuda a respirar.'},
+  pelvis:{body:'Quadril',bone:'Pélvis',desc:'Liga as pernas à coluna. O formato do quadril separa os dois grandes grupos: saurísquios e ornitísquios.'},
+  tail:{body:'Cauda',bone:'Vértebras da cauda',desc:'Equilibra o corpo, sobretudo nos bípedes. Em alguns animais serve de arma ou de remo.'},
+  foreleg:{body:'Membro anterior',bone:'Membro anterior',desc:'Pequeno e com garras nos tiranossauros; nos quadrúpedes sustenta o peso do corpo.'},
+  hindleg:{body:'Membro posterior',bone:'Fêmur, tíbia e pé',desc:'O fêmur é o maior osso da perna. As pernas ficavam sob o corpo, como pilares, e carregavam todo o peso.'},
+  claws:{body:'Garras e unhas',bone:'Garras e unhas',desc:'Pontas de queratina sobre os ossos dos dedos: agarram presas, cavam ou ajudam na defesa.'},
+  plates:{body:'Placas dorsais',bone:'Placas dorsais',desc:'Placas ósseas cobertas de pele, usadas para exibição e reconhecimento.'},
+  sail:{body:'Vela dorsal',bone:'Espinhos da vela',desc:'Espinhos altos das vértebras sustentavam a pele da vela, usada em exibição.'},
+  spikes:{body:'Espinhos',bone:'Espinhos',desc:'Armas de defesa na cauda, nos quadris ou no pescoço.'},
+  armor:{body:'Armadura',bone:'Placas ósseas da pele',desc:'Ossinhos dentro da pele que protegiam o animal de mordidas.'},
+  club:{body:'Clava da cauda',bone:'Clava da cauda',desc:'Massa óssea na ponta da cauda, usada como arma contra predadores.'},
+  flipper:{body:'Nadadeira',bone:'Ossos da nadadeira',desc:'Membros transformados em remos para nadar.'},
+  fluke:{body:'Nadadeira da cauda',bone:'Cauda',desc:'Lobos da cauda que davam impulso para nadar.'},
+  fin:{body:'Nadadeira dorsal',bone:'Nadadeira dorsal',desc:'Estabiliza o corpo durante a natação.'},
+  feathers:{body:'Penas',bone:'Penas',desc:'Isolamento térmico e exibição. Em alguns animais também ajudavam a planar.'}
+};
+const ERAS = [
+  {name:'Triássico', from:252, to:201},
+  {name:'Jurássico', from:201, to:145},
+  {name:'Cretáceo', from:145, to:66}
+];
+const $ = (s, r)=> (r||document).querySelector(s);
+const norm = s => s.normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase();
+const slug = s => norm(s).replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+const eraOf = d => d.per.split(' ')[0];
+const maNum = d => parseFloat(d.ma.split('–')[0].replace(',','.'));
+const fmtL = L => String(L).replace('.',',') + ' m';
+const esc = s => String(s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+DINOS.forEach((d,i)=>{ d.i = i; d.slug = slug(d.n); d.hay = norm([d.n,d.s,d.loc,d.per,d.diet.join(' ')].join(' ')); });
+const bySlug = Object.fromEntries(DINOS.map(d=>[d.slug,d]));
+
+/* ---------- 3D: cena base ---------- */
+const viewers = [];
+function cssColor(name){ return getComputedStyle(document.documentElement).getPropertyValue(name).trim() || '#c9d1c4'; }
+function addLights(scene){
+  scene.add(new THREE.HemisphereLight(0xffffff,0x6a7a66,.9));
+  const sun = new THREE.DirectionalLight(0xffffff,.9); sun.position.set(6,10,7); scene.add(sun);
+  const rim = new THREE.DirectionalLight(0xbcd8ff,.35); rim.position.set(-7,4,-6); scene.add(rim);
+}
+function shadowTexture(){
+  const c = document.createElement('canvas'); c.width = c.height = 128;
+  const g = c.getContext('2d'); const gr = g.createRadialGradient(64,64,4,64,64,62);
+  gr.addColorStop(0,'rgba(0,0,0,.38)'); gr.addColorStop(1,'rgba(0,0,0,0)'); g.fillStyle = gr; g.fillRect(0,0,128,128);
+  return new THREE.CanvasTexture(c);
+}
+function disposeModel(res){
+  if(!res) return;
+  res.group.traverse(o=>{ if(o.geometry && o.geometry.dispose) o.geometry.dispose(); });
+  Object.values(res.parts).forEach(p=>Object.values(p.mats).forEach(m=>m.dispose()));
+}
+
+function makeViewer(host, opts){
+  opts = opts || {};
+  let renderer;
+  try{ renderer = new THREE.WebGLRenderer({antialias:true, alpha:true}); }
+  catch(e){ host.insertAdjacentHTML('afterbegin','<div class="nogl">Este navegador não conseguiu iniciar o 3D. Os dados de cada animal continuam disponíveis.</div>'); return null; }
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio||1, 2));
+  const cv = renderer.domElement; host.insertBefore(cv, host.firstChild);
+  const scene = new THREE.Scene(); addLights(scene);
+  const cam = new THREE.PerspectiveCamera(34,1,.1,400);
+  const ground = new THREE.Mesh(new THREE.CircleGeometry(9,64), new THREE.MeshStandardMaterial({color:cssColor('--ground'), roughness:1}));
+  ground.rotation.x = -Math.PI/2; ground.position.y = -.02; scene.add(ground);
+  const water = new THREE.Mesh(new THREE.CircleGeometry(9,64), new THREE.MeshBasicMaterial({color:0x3b8fc4, transparent:true, opacity:.16}));
+  water.rotation.x = -Math.PI/2; scene.add(water);
+  const shadow = new THREE.Mesh(new THREE.PlaneGeometry(1,1), new THREE.MeshBasicMaterial({map:shadowTexture(), transparent:true, depthWrite:false}));
+  shadow.rotation.x = -Math.PI/2; shadow.position.y = .01; scene.add(shadow);
+
+  const V = {renderer, scene, cam, host, model:null, az:.85, el:.26, zoom:1, dist:20, target:new THREE.Vector3(0,2,0), auto:true, active:true, visible:true, last:0, dragging:false, hl:null};
+  const ptrs = new Map(); let moved = 0, downT = 0, pinch = 0;
+
+  V.size = function(){
+    const w = host.clientWidth || 300, h = host.clientHeight || 300;
+    renderer.setSize(w,h,false); cam.aspect = w/h; cam.updateProjectionMatrix(); V.fit();
+  };
+  V.fit = function(){
+    const m = V.model; if(!m) return;
+    const s = m.size, a = cam.aspect, t = Math.tan(17*Math.PI/180);
+    const R = Math.max(s.x, s.z)/2;
+    V.dist = Math.max(R*1.3/(t*Math.min(a,1.7)), s.y*1.45/(2*t)) * 1.1;
+    V.target.set(0, s.y*.45 + (m.marine?1.2:0), 0);
+  };
+  V.setModel = function(res){
+    if(V.model){ scene.remove(V.model.group); disposeModel(V.model); }
+    V.model = res; scene.add(res.group); V.hl = null;
+    ground.visible = !res.marine; water.visible = !!res.marine; shadow.visible = !res.marine;
+    shadow.scale.set(res.size.x*1.1, res.size.z*1.6+2.4, 1);
+    V.fit();
+  };
+  V.highlight = function(part){
+    V.hl = part;
+    if(!V.model) return;
+    Object.entries(V.model.parts).forEach(([k,p])=>Object.values(p.mats).forEach(m=>{
+      m.emissive.setHex(k===part ? 0xd98e04 : 0x000000); m.emissiveIntensity = k===part ? .75 : 0;
+    }));
+  };
+  V.theme = function(){ ground.material.color.set(cssColor('--ground')); };
+  V.pick = function(ev){
+    if(!V.model) return;
+    const r = cv.getBoundingClientRect();
+    const ndc = new THREE.Vector2(((ev.clientX-r.left)/r.width)*2-1, -((ev.clientY-r.top)/r.height)*2+1);
+    const rc = new THREE.Raycaster(); rc.setFromCamera(ndc, cam);
+    const hit = rc.intersectObject(V.model.group, true)[0];
+    if(hit && hit.object.userData.part && opts.onPick) opts.onPick(hit.object.userData.part);
+  };
+  cv.addEventListener('pointerdown', e=>{
+    cv.setPointerCapture(e.pointerId); ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY}); moved = 0; downT = performance.now(); V.dragging = true; V.last = performance.now();
+    if(ptrs.size===2){ const [a,b] = [...ptrs.values()]; pinch = Math.hypot(a.x-b.x,a.y-b.y); }
+  });
+  cv.addEventListener('pointermove', e=>{
+    const p = ptrs.get(e.pointerId); if(!p) return;
+    const dx = e.clientX-p.x, dy = e.clientY-p.y; p.x = e.clientX; p.y = e.clientY; moved += Math.abs(dx)+Math.abs(dy); V.last = performance.now();
+    if(ptrs.size===1){ V.az -= dx*.008; V.el = Math.max(-.05, Math.min(1.3, V.el + dy*.006)); }
+    else if(ptrs.size===2){ const [a,b] = [...ptrs.values()]; const d = Math.hypot(a.x-b.x,a.y-b.y); if(pinch) V.zoom = Math.max(.35, Math.min(1.8, V.zoom*pinch/d)); pinch = d; }
+  });
+  const up = e=>{
+    if(!ptrs.has(e.pointerId)) return;
+    ptrs.delete(e.pointerId); if(ptrs.size===0){ V.dragging = false; if(moved<6 && performance.now()-downT<500) V.pick(e); } pinch = 0;
+  };
+  cv.addEventListener('pointerup', up); cv.addEventListener('pointercancel', up);
+  cv.addEventListener('wheel', e=>{ e.preventDefault(); V.zoom = Math.max(.35, Math.min(1.8, V.zoom*(1+Math.sign(e.deltaY)*.08))); V.last = performance.now(); }, {passive:false});
+
+  function frame(now){
+    requestAnimationFrame(frame);
+    if(!V.active || !V.visible || !V.model) return;
+    if(V.auto && !V.dragging && now - V.last > 1500) V.az += .0038;
+    const d = V.dist*V.zoom, ce = Math.cos(V.el);
+    cam.position.set(V.target.x + d*ce*Math.sin(V.az), V.target.y + d*Math.sin(V.el), V.target.z + d*ce*Math.cos(V.az));
+    cam.lookAt(V.target); renderer.render(scene, cam);
+  }
+  requestAnimationFrame(frame);
+  if('ResizeObserver' in window) new ResizeObserver(()=>V.size()).observe(host); else window.addEventListener('resize', V.size);
+  if('IntersectionObserver' in window) new IntersectionObserver(es=>{ V.visible = es[0].isIntersecting; }).observe(host);
+  V.size(); viewers.push(V);
+  return V;
+}
+
+/* ---------- miniaturas ---------- */
+let thumbR = null, thumbScene = null, thumbCam = null, thumbShadow = null;
+const thumbs = {};
+function thumbFor(d){
+  if(thumbs[d.slug]) return thumbs[d.slug];
+  if(!thumbR){
+    try{ thumbR = new THREE.WebGLRenderer({antialias:true, alpha:true, preserveDrawingBuffer:true}); }catch(e){ thumbR = false; }
+    if(!thumbR) return null;
+    thumbR.setPixelRatio(1); thumbR.setSize(480,300,false);
+    thumbScene = new THREE.Scene(); addLights(thumbScene);
+    thumbCam = new THREE.PerspectiveCamera(30,1.6,.1,400);
+    thumbShadow = new THREE.Mesh(new THREE.PlaneGeometry(1,1), new THREE.MeshBasicMaterial({map:shadowTexture(), transparent:true, depthWrite:false}));
+    thumbShadow.rotation.x = -Math.PI/2; thumbShadow.position.y = .01; thumbScene.add(thumbShadow);
+  }
+  const res = buildDino(d,'body'); thumbScene.add(res.group);
+  thumbShadow.visible = !res.marine; thumbShadow.scale.set(res.size.x*1.1, res.size.z*1.6+2.4, 1);
+  const s = res.size, t = Math.tan(15*Math.PI/180);
+  const dist = Math.max(Math.max(s.x,s.z)*.5*1.2/(t*1.6), s.y*1.5/(2*t)) * 1.12;
+  const az = .75, el = .2, ty = s.y*.45 + (res.marine?1.2:0);
+  thumbCam.position.set(dist*Math.cos(el)*Math.sin(az), ty + dist*Math.sin(el), dist*Math.cos(el)*Math.cos(az));
+  thumbCam.lookAt(0,ty,0); thumbR.render(thumbScene, thumbCam);
+  const url = thumbR.domElement.toDataURL('image/png');
+  thumbScene.remove(res.group); disposeModel(res);
+  thumbs[d.slug] = url; return url;
+}
+const thumbQueue = [];
+function pumpThumbs(){
+  const job = thumbQueue.shift(); if(!job) return;
+  try{ const u = thumbFor(job.d); if(u){ job.img.src = u; job.img.hidden = false; job.ph.hidden = true; } }catch(e){}
+  setTimeout(pumpThumbs, 16);
+}
+const thumbObs = 'IntersectionObserver' in window ? new IntersectionObserver(es=>{
+  es.forEach(e=>{ if(!e.isIntersecting) return; thumbObs.unobserve(e.target);
+    const d = DINOS[+e.target.dataset.i]; const img = e.target.querySelector('img'), ph = e.target.querySelector('.ph');
+    if(thumbs[d.slug]){ img.src = thumbs[d.slug]; img.hidden = false; ph.hidden = true; return; }
+    const start = thumbQueue.length===0; thumbQueue.push({d,img,ph}); if(start) setTimeout(pumpThumbs, 0);
+  });
+}, {rootMargin:'240px'}) : null;
+
+/* ---------- catálogo ---------- */
+const state = {cls:'', era:'', q:'', sort:'n'};
+const maxL = Math.max(...DINOS.map(d=>d.L));
+function cardHTML(d){
+  return '<button class="card" type="button" data-slug="'+d.slug+'">'
+    + '<div class="pic" data-i="'+d.i+'"><span class="mono no">Nº '+String(d.i+1).padStart(3,'0')+'</span><div class="ph">'+esc(d.n[0])+'</div><img alt="Modelo 3D de '+esc(d.n)+'" hidden></div>'
+    + '<div class="body"><span class="badge c-'+d.c+'"><i class="sw"></i>'+CLASSES[d.c].one+'</span>'
+    + '<h3>'+esc(d.n)+'</h3><div class="sci">'+esc(d.s)+'</div>'
+    + '<div class="meta"><span>'+esc(d.per)+'</span><span>'+fmtL(d.L)+'</span></div>'
+    + '<div class="bar c-'+d.c+'"><i style="width:'+Math.max(3,d.L/maxL*100).toFixed(1)+'%"></i></div></div></button>';
+}
+function list(){
+  const q = norm(state.q.trim());
+  let out = DINOS.filter(d=>(!state.cls||d.c===state.cls)&&(!state.era||eraOf(d)===state.era)&&(!q||d.hay.includes(q)));
+  if(state.sort==='n') out.sort((a,b)=>a.n.localeCompare(b.n,'pt'));
+  else if(state.sort==='L') out.sort((a,b)=>b.L-a.L);
+  else out.sort((a,b)=>maNum(b)-maNum(a));
+  return out;
+}
+function renderGrid(){
+  const out = list(); const g = $('#grid');
+  $('#count').textContent = out.length + (out.length===1?' animal':' animais');
+  g.innerHTML = out.length ? out.map(cardHTML).join('') : '<div class="empty">Nenhum animal encontrado. Tente outra busca ou limpe os filtros.</div>';
+  if(thumbObs) g.querySelectorAll('.pic').forEach(p=>thumbObs.observe(p));
+  else g.querySelectorAll('.pic').forEach(p=>{ const d = DINOS[+p.dataset.i]; thumbQueue.push({d,img:p.querySelector('img'),ph:p.querySelector('.ph')}); }), pumpThumbs();
+  $$chips();
+}
+function $$chips(){ document.querySelectorAll('#classChips .btn').forEach(b=>b.classList.toggle('on', b.dataset.cls===state.cls)); }
+function buildFilters(){
+  const cnt = c => DINOS.filter(d=>!c||d.c===c).length;
+  $('#classChips').innerHTML = [['','Todos']].concat(Object.entries(CLASSES).map(([k,v])=>[k,v.many]))
+    .map(([k,l])=>'<button class="btn" type="button" data-cls="'+k+'">'+l+' ('+cnt(k)+')</button>').join('');
+  $('#classLinks').innerHTML = Object.entries(CLASSES).map(([k,v])=>'<button type="button" class="c-'+k+'" data-cls="'+k+'"><i class="sw"></i><span style="color:var(--ink)">'+cnt(k)+' '+v.many.toLowerCase()+'</span></button>').join('');
+  $('#classChips').addEventListener('click', e=>{ const b = e.target.closest('[data-cls]'); if(!b) return; state.cls = b.dataset.cls; renderGrid(); });
+  $('#classLinks').addEventListener('click', e=>{ const b = e.target.closest('[data-cls]'); if(!b) return; state.cls = b.dataset.cls; renderGrid(); $('#catalogo').scrollIntoView(); });
+  $('#eraSel').addEventListener('change', e=>{ state.era = e.target.value; renderGrid(); });
+  $('#sortSel').addEventListener('change', e=>{ state.sort = e.target.value; renderGrid(); });
+  $('#q').addEventListener('input', e=>{ state.q = e.target.value; renderGrid(); });
+  $('#grid').addEventListener('click', e=>{ const c = e.target.closest('.card'); if(c) openDetail(bySlug[c.dataset.slug], c); });
+}
+
+/* ---------- seções informativas ---------- */
+function buildSections(){
+  $('#partsGrid').innerHTML = PART_ORDER.filter(k=>k!=='eye').map(k=>{
+    const p = PARTS[k]; const alt = p.body!==p.bone ? '<span class="alt">No corpo: '+p.body+'</span>' : '';
+    return '<div>'+alt+'<h3>'+p.bone+'</h3><p>'+p.desc+'</p></div>';
+  }).join('');
+  $('#dietGrid').innerHTML = Object.entries(CLASSES).map(([k,v])=>{
+    const m = {}; DINOS.filter(d=>d.c===k).forEach(d=>d.diet.forEach(x=>m[x]=(m[x]||0)+1));
+    const top = Object.entries(m).sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0],'pt')).slice(0,8); const mx = top[0][1];
+    return '<div><h3 class="c-'+k+'"><i class="sw"></i><span style="color:var(--ink)">'+v.many+'</span></h3><ul class="rank c-'+k+'">'
+      + top.map(([n,c])=>'<li><span style="color:var(--ink)">'+esc(n)+'</span><span>'+c+'</span><div class="bar"><i style="width:'+(c/mx*100)+'%"></i></div></li>').join('')+'</ul></div>';
+  }).join('');
+  $('#eraGrid').innerHTML = ERAS.map(e=>{
+    const ds = DINOS.filter(d=>eraOf(d)===e.name).sort((a,b)=>a.n.localeCompare(b.n,'pt'));
+    return '<div class="era"><h3>'+e.name+'</h3><div class="span">'+e.from+' a '+e.to+' milhões de anos · '+ds.length+' animais</div><div class="chipnames">'
+      + ds.map(d=>'<button type="button" class="c-'+d.c+'" data-slug="'+d.slug+'">'+esc(d.n)+'</button>').join('')+'</div></div>';
+  }).join('');
+  $('#eraGrid').addEventListener('click', e=>{ const b = e.target.closest('[data-slug]'); if(b) openDetail(bySlug[b.dataset.slug], b); });
+}
+
+/* ---------- detalhe ---------- */
+let detV = null, cur = null, curMode = 'body', curPart = null, opener = null;
+function setHash(h){ try{ history.replaceState(null,'',h); }catch(e){} }
+function partListHTML(res, d){
+  return PART_ORDER.filter(k=>res.parts[k] && res.parts[k].meshes.length).map(k=>{
+    const p = PARTS[k]; const label = curMode==='bone' ? p.bone : p.body;
+    const extra = k==='teeth' ? ' '+d.teeth : '';
+    return '<button type="button" data-part="'+k+'" aria-pressed="'+(k===curPart)+'"><strong>'+label+'</strong><small>'+p.desc+extra+'</small></button>';
+  }).join('');
+}
+function showModel(){
+  const res = buildDino(cur, curMode); detV.setModel(res);
+  if(curPart && !res.parts[curPart]) curPart = null;
+  detV.highlight(curPart);
+  $('#plist').innerHTML = partListHTML(res, cur);
+  document.querySelectorAll('#detStage [data-mode]').forEach(b=>b.classList.toggle('on', b.dataset.mode===curMode));
+}
+function openDetail(d, from){
+  if(!d) return;
+  cur = d; curMode = 'body'; curPart = null; opener = from || null;
+  const person = 1.7, bus = 12, mx = Math.max(d.L, bus);
+  const facts = [['Período',d.per],['Há quantos anos',d.ma+' milhões'],['Comprimento',fmtL(d.L)],['Peso',d.W],['Onde viveu',d.loc],['Classe',CLASSES[d.c].one]];
+  $('#detInfo').innerHTML =
+    '<div><div class="badge c-'+d.c+'"><i class="sw"></i>'+CLASSES[d.c].one+' · Nº '+String(d.i+1).padStart(3,'0')+'</div><h2 id="dName">'+esc(d.n)+'</h2><div class="sci">'+esc(d.s)+'</div></div>'
+    + (d.c==='m' ? '<div class="warn"><b>Não é um dinossauro.</b> Répteis marinhos viveram na mesma época, mas formam outros grupos de répteis. Estão no atlas porque dividiam os mares com a fauna da Era dos Dinossauros.</div>' : '')
+    + '<div class="facts">'+facts.map(f=>'<div><span class="mono">'+f[0]+'</span><b>'+esc(f[1])+'</b></div>').join('')+'</div>'
+    + '<div><h4>O que comia</h4><div class="foods c-'+d.c+'">'+d.diet.map(x=>'<span style="color:var(--ink);border-color:currentColor">'+esc(x)+'</span>').join('')+'</div></div>'
+    + '<div><h4>Boca e dentes</h4><p style="margin:0">'+esc(d.teeth)+'</p></div>'
+    + '<div><h4>Curiosidade</h4><p style="margin:0">'+esc(d.f)+'</p></div>'
+    + '<div><h4>Tamanho real</h4><div class="scale">'
+    + '<div><span>Pessoa · 1,7 m</span><i style="width:'+(person/mx*100)+'%"></i></div>'
+    + '<div><span>Ônibus · 12 m</span><i style="width:'+(bus/mx*100)+'%"></i></div>'
+    + '<div class="me c-'+d.c+'"><span style="color:var(--ink)">'+esc(d.n.split(' ')[0])+' · '+fmtL(d.L)+'</span><i style="width:'+(d.L/mx*100)+'%"></i></div></div></div>'
+    + '<div><h4>Partes do corpo · toque para destacar no 3D</h4><div class="plist" id="plist"></div></div>';
+  const ov = $('#detail'); ov.hidden = false; ov.scrollTop = 0; document.body.style.overflow = 'hidden';
+  $('#detTag').textContent = d.n+' · '+d.per+' · '+fmtL(d.L);
+  if(!detV) detV = makeViewer($('#detStage'), {onPick: k=>selectPart(k)});
+  if(heroV) heroV.active = false;
+  if(detV){ detV.zoom = 1; detV.az = .85; detV.auto = true; $('#spinBtn').classList.add('on'); showModel(); detV.size(); }
+  setHash('#'+d.slug); $('#closeBtn').focus();
+}
+function selectPart(k){
+  curPart = (curPart===k) ? null : k; if(detV) detV.highlight(curPart);
+  document.querySelectorAll('#plist [data-part]').forEach(b=>b.setAttribute('aria-pressed', String(b.dataset.part===curPart)));
+  const b = $('#plist [aria-pressed=true]'); if(b) b.scrollIntoView({block:'nearest'});
+}
+function closeDetail(){
+  $('#detail').hidden = true; document.body.style.overflow = ''; if(heroV) heroV.active = true;
+  setHash('#catalogo'); if(opener && opener.focus) try{ opener.focus(); }catch(e){}
+}
+
+/* ---------- hero e tema ---------- */
+let heroV = null, heroD = DINOS.find(d=>d.n==='Tyrannosaurus rex') || DINOS[0], heroMode = 'body';
+function showHero(){
+  if(!heroV) return;
+  heroV.setModel(buildDino(heroD, heroMode));
+  $('#heroTag').textContent = heroD.n+' · '+heroD.per+' · '+heroD.ma+' Ma · '+fmtL(heroD.L);
+  document.querySelectorAll('#heroStage [data-mode]').forEach(b=>b.classList.toggle('on', b.dataset.mode===heroMode));
+}
+function toggleTheme(){
+  const el = document.documentElement;
+  const now = el.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  const next = now==='dark' ? 'light' : 'dark'; el.dataset.theme = next;
+  try{ localStorage.setItem('atlas-tema', next); }catch(e){}
+  viewers.forEach(v=>v.theme());
+}
+
+/* ---------- início ---------- */
+function init(){
+  try{ const t = localStorage.getItem('atlas-tema'); if(t) document.documentElement.dataset.theme = t; }catch(e){}
+  $('#heroKicker').textContent = 'Catálogo de campo · '+DINOS.length+' espécies';
+  $('#noteCount').textContent = DINOS.length;
+  buildFilters(); buildSections(); renderGrid();
+  heroV = makeViewer($('#heroStage'), {onPick:()=>{}});
+  showHero();
+  $('#heroStage').addEventListener('click', e=>{ const b = e.target.closest('[data-mode]'); if(!b) return; heroMode = b.dataset.mode; showHero(); });
+  $('#randomBtn').addEventListener('click', ()=>{ let n; do{ n = DINOS[Math.floor(Math.random()*DINOS.length)]; }while(n===heroD); heroD = n; showHero(); });
+  $('#detStage').addEventListener('click', e=>{
+    const b = e.target.closest('[data-mode]'); if(b){ curMode = b.dataset.mode; showModel(); return; }
+    if(e.target.id==='spinBtn' && detV){ detV.auto = !detV.auto; e.target.classList.toggle('on', detV.auto); }
+  });
+  $('#detInfo').addEventListener('click', e=>{ const b = e.target.closest('[data-part]'); if(b) selectPart(b.dataset.part); });
+  $('#closeBtn').addEventListener('click', closeDetail);
+  $('#detail').addEventListener('click', e=>{ if(e.target.id==='detail') closeDetail(); });
+  document.addEventListener('keydown', e=>{ if(e.key==='Escape' && !$('#detail').hidden) closeDetail(); });
+  $('#themeBtn').addEventListener('click', toggleTheme);
+  const h = location.hash.slice(1); if(bySlug[h]) openDetail(bySlug[h]);
+}
+init();
+</script>
